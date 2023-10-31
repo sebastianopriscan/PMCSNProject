@@ -32,29 +32,30 @@ Obiettivo aggiuntivo: minimizzare clienti Idle (non in coda/giostra)
 ## 2. Conceptual Model
 
 Client:
-- state: enum { BUSY, IDLE, IN_QUEUE }
-- type: enum { NORMAL, VIP }
-- group: list client
-- max_queue_time: int
+- `state`: enum { BUSY, IDLE, IN_QUEUE }
+- `type`: enum { NORMAL, VIP }
+- `group`: Client [1..n]
+- `max_queue_time`: `int`
 
 Attraction:
-- type: enum { SHOW, RIDE }
-- state: enum { BUSY, IDLE }
-- capacity: int
-- popularity: float
-- mean_length_time: int
+- `type`: enum { SHOW, RIDE }
+- `state`: enum { BUSY, IDLE } [1..capacity]
+- `capacity`: `int`
+- `popularity`: `float`
+- `mean_length_time`: `int`
 
 Objective Parameters (dynamic):
-- price of VIP ticket: int
-- price of normal ticket: int
-- percentage of VIP ticket: int 
-- percentage of normal ticket: int 
-- percentage of rides: int 
-- percentage of shows: int 
+- price of VIP ticket: `int`
+- price of normal ticket: `int`
+- percentage of VIP ticket: `int`
+- percentage of normal ticket: `int`
+- percentage of rides: `int`
+- percentage of shows: `int`
 
 Constants:
-- maintenance cost: int
-- construction cost per seat: int
+- maintenance cost per rides: `int`
+- maintenance cost per shows: `int`
+- construction cost per seat (per rides): `int`
 
 <!-- TODO: check with step 7 -->
 <!-- Simulation Parameters: -->
@@ -65,4 +66,22 @@ Constraints (interrelation):
 - $\sum_{j \in \text{Attraction}} \text{j.popularity} = 1$
 - percentage of VIP ticket + percentage of normal ticket = 100
 - percentage of rides + percentage of shows = 100
+
+[Figma](https://www.figma.com/file/zFG8SEBIXFHGgtrGlmpwuW/PMCSNAmusementParkProject?type=design&mode=design&t=TMgxlRdeCfl4DeZ4-1)
+
+## 3. Specification Model
+
+Rides:
+- Arrival: exponential
+- Service Time: normal (with mean _vedi tabella_ and variance $0.1*\text{mean}$, coupled between servers)
+  - TODO: check variance
+
+Shows:
+- Arrival: exponential
+- Service Time: exponential/pareto, uncoupled
+
+Patience: normal (TODO: choose parameters)
+- Determined by the lowest `max_queue_time` in the group
+
+Decision (switch from IDLE to IN_QUEUE): exponential (with low lambda)
 
