@@ -85,3 +85,22 @@ Patience: normal (TODO: choose parameters)
 
 Decision (switch from IDLE to IN_QUEUE): exponential (with low lambda)
 
+| Attraction Name    | Arrival    | Service Time Mean    | Service Time Variance | Type | No. of seats|
+|---------------- | --------------- | --------------- | ----- | -- | -- |
+| Alice in Wonderland    | --    | <center>4 Min    | --- | <center> Ride | 16 |
+| Casey Jr. Circus Train   | --   | <center> 4 Min   | --- | <center> Ride | 20 |
+| Dumbo the Flying Elephant | --   | <center> 2 Min   | --- | <center> Ride | 16 |
+| It's a small world | --   | <center> 14 Min   | --- | <center> Ride | 16 |
+| King Arthur Carousel | --   | <center> 3 Min   | --- | <center> Ride | 68 |
+| Mad Tea Party | --   | <center> 2 Min   | --- | <center> Ride | 18 |
+| Matterhorn Bobsleds | --   | <center> 4 Min   | --- | <center> Ride | 120 |
+| Mr Toad's Wild Ride | --   | <center> 2 Min   | --- | <center> Ride | 32 |
+| Pearly Band | --   | <center> 15 Min   | --- | <center> Show | -- |
+| Peter Pan's Flight | --   | <center> 3 Min   | --- | <center> Ride | 16? |
+| Pinocchio's Daring Journey | --   | <center> 3 Min   | --- | <center> Ride | ? |
+| The Royal Swing Big Band Ball | --   | <center> 30 Min   | --- | <center> Show | -- |
+| Sleeping Beauty Castle Walkthrough | --   | <center> 15 Min   | --- | <center> Show | -- |
+| Snow White's Enchanted Wish | --   | <center> 2 Min   | --- | <center> Ride | 6*x |
+| Storybook Land Canal Boats | --   | <center> 10 Min   | --- | <center> Ride | 14 |
+| Storytelling at Royal Theatre | --   | <center> 20 Min   | --- | <center> Show | -- |
+| Tale of the Lion King | --   | <center> 24 Min   | --- | <center> Show | -- |
