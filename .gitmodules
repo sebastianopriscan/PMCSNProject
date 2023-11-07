@@ -1,4 +1,3 @@
 [submodule "libs/NextEventSimulationFramework"]
 	path = libs/NextEventSimulationFramework
 	url = https://github.com/SebastianOpriscan/NextEventSimulationFramework
-  branch = add_event_matadata
