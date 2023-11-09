@@ -63,30 +63,6 @@ void destroy_state(struct simulation_state *state)
   free(state) ;
 }
 
-// void server_wakeup(struct simulation *sim, void *metadata)
-// {
-//   int i = (int) metadata;
-//   struct simulation_state *state = (struct simulation_state*) sim->state;
-  
-//   if(state->vip_Clients > 0)
-//     state->vip_Clients -= 1;
-//   else if (state->n_Clients > 0)
-//     state->n_Clients -= 1;
-//   else {
-//     state->servers_status[i] = 0;
-//     return;
-//   }
-
-//   event *event = createEvent(sim->clock, server_activate, NULL, metadata);
-//   struct queue_list *queue_l = sim->queues->next;
-//   for (int j = 0; j < i; j++)
-//   {
-//     queue_l = queue_l->next;
-//   }
-  
-//   enqueue_event(queue_l->queue, event);
-// }
-
 void server_activate(struct simulation *sim, void *metadata)
 {
   int i = (int) metadata;
@@ -96,11 +72,11 @@ void server_activate(struct simulation *sim, void *metadata)
   double service_time = 0.0;
   
   if (state ->vip_Clients >0 || state->n_Clients > 0)
-   service_time = Exponential(1/state->mu);
+   service_time = Normal(state->mu, state->sigma) ;
 
   if(state->vip_Clients > 0) {
     state->vip_Clients -= 1;
-    state->total_delay_vip += sim->clock;
+    state->total_delay_vip += sim->clock - sim->simEnd;
     state->total_service_time_vip += service_time;
     state->total_clients_vip += 1;
   }
@@ -108,7 +84,7 @@ void server_activate(struct simulation *sim, void *metadata)
     state->n_Clients -= 1;
     state->total_service_time_normal += service_time ;
     state->total_clients_normal += 1;
-    state->total_delay_normal += sim->clock ;
+    state->total_delay_normal += sim->clock - sim->simEnd;
   }
   else {
     state->servers_status[i] = 0;
@@ -132,21 +108,18 @@ void arrivalPayload(struct simulation *sim, void *metadata) {
     double p = Uniform(0.0, 1.0);
     if (p > 0.5) {
       state->vip_Clients += 1;
-      state->total_delay_vip -= sim->clock;
+      state->total_delay_vip -= sim->clock ;
+      state->total_delay_vip += sim->simEnd;
     }else {
       state->n_Clients += 1 ;
       state->total_delay_normal -= sim->clock ;
+      state->total_delay_normal += sim->simEnd;
     }
 
     for(int i = 0 ; i < state->n_of_Servers ; i++)
     {
       if(state->servers_status[i] == 0)
       {
-        /*if(state->vip_Clients > 0)
-          state->vip_Clients -= 1 ;
-        else if (state->n_Clients > 0)
-          state->n_Clients -= 1;*/
-  
         event * event = createEvent(sim->clock, server_activate, NULL, (void *)i) ;
         add_event_to_simulation(sim, event, i+1);
         break;
@@ -167,19 +140,37 @@ void next_arrival(struct simulation *sim, void *metadata) {
     enqueue_event(sim->queues->queue, event1) ;
 }
 
+struct simulation_state *run_single_simulation(double lambda, double mu, int server_num) {
+    struct simulation_state* state = init_state(server_num, lambda, mu, 0.1 * mu);
+    PlantSeeds(12345);
+    simulation *sim = create_simulation(sizeof(struct simulation_state) + sizeof(char) * server_num, server_num + 1, 960, (char *) state);
+    event *event = createEvent(0.0, next_arrival, NULL, NULL);
+    enqueue_event(sim->queues->queue, event);
+    run_simulation(sim);
+    destroy_state(state);
+    state = (struct simulation_state*)(sim->state);
+    return state;
+}
+
+double run_lambda_evaluator(double expected_wait, double threshold, double mu, int server_num) {
+  double lambda = 0.1;
+  double checker = 0.0;
+  do {
+    lambda += 0.01;
+    struct simulation_state *state = run_single_simulation(lambda, mu, server_num);
+    double result = (state->total_delay_normal + state->total_delay_vip) / (state->total_clients_normal + state->total_clients_vip);
+    checker = (result - expected_wait) > 0 ? result - expected_wait : expected_wait - result ;
+   } while (checker > threshold);
+   return lambda;
+}
+
 int main(void) {
-  struct simulation_state* state = init_state(2, 2, 3, 0.3);
-  PlantSeeds(12345);
-  simulation *sim = create_simulation(sizeof(struct simulation_state) + sizeof(char) * 2, 3, 100000, (char *) state);
-  event *event = createEvent(0.0, next_arrival, NULL, NULL);
-  enqueue_event(sim->queues->queue, event);
-  run_simulation(sim);
-  destroy_state(state);
-  state = (struct simulation_state*)(sim->state);
-  printf("%6.2f, %6.2f, %6.2f, %6.2f, %d , %d\n", state->total_delay_normal, state->total_delay_vip, state->total_service_time_normal, state->total_service_time_vip, state->total_clients_normal, state->total_clients_vip);
-  printf("Average Queue Time (normal): %6.2f\n", state->total_delay_normal / state->total_clients_normal);
-  printf("Average Queue Time (vip): %6.2f\n", state->total_delay_vip / state->total_clients_vip);
-  printf("Average Queue Time: %6.2f\n", (state->total_delay_normal + state->total_delay_vip) / (state->total_clients_normal + state->total_clients_vip));
+  double lambda = run_lambda_evaluator(30.0, 0.5, 4.0, 16);
+  printf("Lambda: %6.6f\n", lambda);
+  struct simulation_state *state = run_single_simulation(lambda, 4.0, 16);
+  printf("Average Queue Time (normal): %6.6f\n", state->total_delay_normal / state->total_clients_normal);
+  printf("Average Queue Time (vip): %6.6f\n", state->total_delay_vip / state->total_clients_vip);
+  printf("Average Queue Time: %6.6f\n", (state->total_delay_normal + state->total_delay_vip) / (state->total_clients_normal + state->total_clients_vip));
   printf("Average Service Time (normal): %6.2f\n", state->total_service_time_normal / state->total_clients_normal);
   printf("Average Service Time (vip): %6.2f\n", state->total_service_time_vip / state->total_clients_vip);
   printf("Average Service Time: %6.2f\n", (state->total_service_time_normal + state->total_service_time_vip) / (state->total_clients_normal + state->total_clients_vip));
