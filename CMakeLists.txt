@@ -24,3 +24,4 @@ endif()
 
 add_subdirectory(libs/NextEventSimulationFramework)
 add_subdirectory(lambda-evaluator)
+add_subdirectory(computational-model)
