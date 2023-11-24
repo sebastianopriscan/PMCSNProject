@@ -23,5 +23,4 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/libs/NextEventSimulationFramework/CMakeList
 endif()
 
 add_subdirectory(libs/NextEventSimulationFramework)
-add_subdirectory(libs/RandomVariates)
 add_subdirectory(lambda-evaluator)
