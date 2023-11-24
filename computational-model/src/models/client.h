@@ -1,3 +1,7 @@
+#ifndef MODEL_H
+#error "Cannot include this file directly"
+#endif
+
 #ifndef CLIENT_H
 #define CLINET_H
 

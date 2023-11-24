@@ -1,3 +1,7 @@
+#ifndef MODEL_H
+#error "Cannot include this file directly"
+#endif
+
 #ifndef PARK_H
 #define PARK_H
 

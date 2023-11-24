@@ -1,3 +1,6 @@
 [submodule "libs/NextEventSimulationFramework"]
 	path = libs/NextEventSimulationFramework
 	url = https://github.com/SebastianOpriscan/NextEventSimulationFramework
+[submodule "libs/json-c"]
+	path = libs/json-c
+	url = https://github.com/json-c/json-c

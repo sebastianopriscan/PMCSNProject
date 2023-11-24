@@ -1,5 +1,5 @@
 {
-    "simulation_time" : 960,
+    "simulation_time" : 960.0,
     "vip_tickets": 0.5,
     "maintenance_cost_per_rides": 1,
     "maintenance_cost_per_shows": 1,

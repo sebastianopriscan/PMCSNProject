@@ -1,3 +1,7 @@
+#ifndef MODEL_H
+#error "Cannot include this file directly"
+#endif
+
 #ifndef SHOW_H
 #define SHOW_H
 
@@ -14,4 +18,4 @@ struct show {
   double sigma;
 };
 
-#endif SHOW_H
+#endif 
