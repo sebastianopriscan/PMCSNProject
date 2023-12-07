@@ -2,7 +2,7 @@
 
 ## 0. Descrizione del sistema
 
-Parco divertimenti con due *tipi di biglietti/utenti*:
+Parco divertimenti (Disneyland Hong Kong) con due *tipi di biglietti/utenti*:
 - VIP: priorità
 - normali: senza priorità
 
@@ -12,22 +12,21 @@ Due *tipi di attrazioni*:
 
 ## 1. Goals and Objectives
 
-Obiettivo preliminare: studiare l'attuale configurazione, 
-decidendo il numero di attrazioni
+Obiettivo preliminare: studiare l'attuale configurazione
 
-Trovare la divisione percentuale dei *tipi di biglietti* 
+- Trovare la divisione percentuale dei *tipi di biglietti*:
+  - nella configurazione attuale
+  - Per ogni giostra :
+      - nella configurazione con il reinserimento della giostra in previsione di un aumento degli arrivi (e.g. Golden "day" Ottobre 1)
+- Valutare quale giostra presenta il profitto migliore in previsione di un aumento di arrivi rispetto alla divisione di *tipi di biglietti* per lei ottimale
 
-Trovare la divisione percentuale dei *tipi di attrazioni* e la capienza
-di ogni attrazione
+Mantenendo comunque i tempi di attesa entro obiettivi di QoS:
+- minimizzare il tempo in coda dei clienti VIP
+- mantenere il tempo in coda dei clienti normali sotto una certa soglia
 
-In modo tale da massimizzare profitto e mantenere i tempi di attesa entro 
-obiettivi di QoS (TODO: da definire)
-
-Profitto dipende da:
+Il profitto dipende da:
 - guardagno da biglietto normale e vip
-- costi di manutenzione e aggiunta di attrazioni
-
-Obiettivo aggiuntivo: minimizzare clienti Idle (non in coda/giostra)
+- costi di manutenzione delle giostre
 
 ## 2. Conceptual Model
 
@@ -70,6 +69,9 @@ Constraints (interrelation):
 [Figma](https://www.figma.com/file/zFG8SEBIXFHGgtrGlmpwuW/PMCSNAmusementParkProject?type=design&mode=design&t=TMgxlRdeCfl4DeZ4-1)
 
 ## 3. Specification Model
+
+Park Info:
+- Capacity: 34.000
 
 Rides:
 - Arrival: exponential
