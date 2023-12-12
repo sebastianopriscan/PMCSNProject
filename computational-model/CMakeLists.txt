@@ -13,3 +13,8 @@ target_include_directories(computational-model PRIVATE ../build/libs/json-c)
 
 target_link_libraries(computational-model PRIVATE NextEventSimulationFramework)
 target_link_libraries(computational-model PRIVATE json-c)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  enable_testing()
+  add_subdirectory(tests)
+endif()

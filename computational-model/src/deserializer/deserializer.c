@@ -39,48 +39,43 @@ struct park *deserialize(const char *file) {
     json_object *park_next_reschedule_rate_json = json_object_object_get(root, "park_next_reschedule_rate");
     json_object *park_exit_probability_json = json_object_object_get(root, "park_exit_probability");
 
-    double simulation_time = json_object_get_double(simulation_time_json);
-    double vip_tickets = json_object_get_double(vip_tickets_json);
-    int maintenance_cost_per_rides = json_object_get_int(maintenance_cost_per_rides_json);
-    int maintenance_cost_per_shows = json_object_get_int(maintenance_cost_per_shows_json);
-    int construction_cost_per_seat = json_object_get_int(construction_cost_per_seat_json);
-    int vip_ticket_price = json_object_get_int(vip_ticket_price_json);
-    int normal_ticket_price = json_object_get_int(normal_ticket_price_json);
-    int number_of_clients = json_object_get_int(number_of_clients_json);
+    park->simulation_time = json_object_get_double(simulation_time_json);
+    park->vip_tickets_percent = json_object_get_double(vip_tickets_json);
+    park->maintainance_cost_per_rides = json_object_get_int(maintenance_cost_per_rides_json);
+    park->maintainance_cost_per_shows = json_object_get_int(maintenance_cost_per_shows_json);
+    park->construction_cost_per_seat = json_object_get_int(construction_cost_per_seat_json);
+    park->vip_ticket_price = json_object_get_int(vip_ticket_price_json);
+    park->normal_ticket_price = json_object_get_int(normal_ticket_price_json);
+    park->number_of_clients = json_object_get_int(number_of_clients_json);
     char* patience_distribution = json_object_get_string(patience_distribution_json);
-    enum distribution_type patience_distr;
     if(strcmp(patience_distribution, "normal") == 0) {
-      patience_distr = NORMAL_DISTRIB;
+      park->patience_distribution = NORMAL_DISTRIB;
     } else if (strcmp(patience_distribution, "exponential") == 0) {
-      patience_distr = EXPONENTIAL;
+      park->patience_distribution = EXPONENTIAL;
     } else if (strcmp(patience_distribution, "equilikely") == 0)  {
-      patience_distr = EQUILIKELY ;
+      park->patience_distribution = EQUILIKELY ;
     } else {
       fprintf(stderr, "Error in parsing patience_distribution %s", patience_distribution);
       return NULL;
     }
-    double patience_mu = json_object_get_double(patience_mu_json);
-    double patience_sigma = json_object_get_double(patience_sigma_json);
-    int max_group_size = json_object_get_int(max_group_size_json);
-    double park_arrival_rate = json_object_get_double(park_arrival_rate_json);
-    double park_next_reschedule_rate = json_object_get_double(park_next_reschedule_rate_json);
-    double park_exit_probability = json_object_get_double(park_exit_probability_json);
-    //array_list *rides_array = json_object_get_array(rides_json);
-    //array_list *shows_array = json_object_get_array(shows_json);
+    park->patience_mu = json_object_get_double(patience_mu_json);
+    park->patience_sigma = json_object_get_double(patience_sigma_json);
+    park->max_group_size = json_object_get_int(max_group_size_json);
+    park->park_arrival_rate = json_object_get_double(park_arrival_rate_json);
+    park->park_next_reschedule_rate = json_object_get_double(park_next_reschedule_rate_json);
+    park->park_exit_probability = json_object_get_double(park_exit_probability_json);
 
-
+    int rides_size = json_object_array_length(rides_json) ;
+    json_object *curr_ride ;
+    struct ride *park_rides = malloc(rides_size * sizeof(struct ride)) ;
     if(park_rides == NULL) {
         fprintf(stderr, "Error allocating rides space from file %s\n", file) ;
         return NULL ;
     }
 
-    int rides_size = json_object_array_length(rides_json) ;
-    json_object *curr_ride ;
-    struct ride *park_rides = malloc(rides_size * (struct ride)) ;
-
     for(int i = 0; i < rides_size ; i++) {
         curr_ride = json_object_array_get_idx(rides_json, i) ;
-        json_object *ride_name = json_object_get(curr_ride, "name") ;
+        json_object *ride_name = json_object_object_get(curr_ride, "name") ;
         
         char *name = json_object_get_string(ride_name) ;
         if(name == NULL) {
@@ -89,11 +84,49 @@ struct park *deserialize(const char *file) {
         }
         int name_len = strlen(name) ;
 
-        if(name )
+        char *name_Allocd ;
+
+        if((name_Allocd = malloc(name_len +1)) == NULL) {
+          fprintf(stderr, "Error allocating spacee for ride name %s\n", file) ;
+          return NULL ;
+        }
+
+        strcpy(name_Allocd, name) ;
+
+        park_rides[i].name = name_Allocd ;
+
+        json_object *ride_server_num = json_object_object_get(curr_ride, "server_num") ;
+        park_rides[i].server_num = json_object_get_int(ride_server_num) ;
+
+        json_object *json_show_popularity = json_object_object_get(curr_ride, "popularity");
+        park_rides[i].popularity = json_object_get_double(json_show_popularity);
+
+        json_object *json_show_mean_time = json_object_object_get(curr_ride, "mean_time");
+        park_rides[i].mean_time= json_object_get_double(json_show_mean_time);
+        
+        json_object *json_show_mu = json_object_object_get(curr_ride, "mu");
+        park_rides[i].mu = json_object_get_double(json_show_mu);
+        
+        json_object *json_show_sigma = json_object_object_get(curr_ride, "sigma");
+        park_rides[i].sigma = json_object_get_double(json_show_sigma);
+        
+        json_object *service_distribution_json = json_object_object_get(curr_ride, "service_distribution");
+        char* service_distribution = json_object_get_string(service_distribution_json);
+        if(strcmp(service_distribution, "normal") == 0) {
+          park_rides[i].distribution = NORMAL_DISTRIB;
+        } else if (strcmp(service_distribution, "exponential") == 0) {
+          park_rides[i].distribution = EXPONENTIAL;
+        } else if (strcmp(service_distribution, "equilikely") == 0)  {
+          park_rides[i].distribution  = EQUILIKELY ;
+        } else {
+          fprintf(stderr, "Error in parsing service_distribution %s", patience_distribution);
+          return NULL;
+        }
+
     }
     int shows_size = json_object_array_length(shows_json) ;
     json_object *curr_show ;
-    struct show *park_shows = malloc(shows_size * (struct show)) ;
+    struct show *park_shows = malloc(shows_size * sizeof(struct show)) ;
 
     if(park_shows == NULL) {
         fprintf(stderr, "Error allocating shows space from file %s\n", file) ;
@@ -101,14 +134,54 @@ struct park *deserialize(const char *file) {
     }
 
     for (int i = 0; i < shows_size; i++) {
-      curr_show = json_object_array_get_idx(shows_json, i);
-      json_object *show_name = json_object_get(curr_show, "name");
+        curr_show = json_object_array_get_idx(shows_json, i);
+        json_object *show_name = json_object_object_get(curr_show, "name");
+        char *name = json_object_get_string(show_name);
+        if (name == NULL) {
+          fprintf(stderr, "String field name is null\n");
+          return NULL;
+        }
+        int name_len = strlen(name);
+
+        char *name_Allocd;
+        if ((name_Allocd = malloc(name_len + 1)) == NULL) {
+          fprintf(stderr, "Error allocating space for show name %s\n", file);
+          return NULL;
+        }
+        strcpy(name_Allocd, name);
+        park_shows[i].name = name_Allocd;
+      
+        json_object *json_show_popularity = json_object_object_get(curr_show, "popularity");
+        park_shows[i].popularity = json_object_get_double(json_show_popularity);
+
+        json_object *json_show_mean_time = json_object_object_get(curr_show, "mean_time");
+        park_shows[i].mean_time= json_object_get_double(json_show_mean_time);
+        
+        json_object *json_show_mu = json_object_object_get(curr_show, "mu");
+        park_shows[i].mu = json_object_get_double(json_show_mu);
+        
+        json_object *json_show_sigma = json_object_object_get(curr_show, "sigma");
+        park_shows[i].sigma = json_object_get_double(json_show_sigma);
+        
+        json_object *service_distribution_json = json_object_object_get(curr_show, "service_distribution");
+        char* service_distribution = json_object_get_string(service_distribution_json);
+        if(strcmp(service_distribution, "normal") == 0) {
+          park_shows[i].distribution = NORMAL_DISTRIB;
+        } else if (strcmp(service_distribution, "exponential") == 0) {
+          park_shows[i].distribution = EXPONENTIAL;
+        } else if (strcmp(service_distribution, "equilikely") == 0)  {
+          park_shows[i].distribution  = EQUILIKELY ;
+        } else {
+          fprintf(stderr, "Error in parsing service_distribution %s", patience_distribution);
+          return NULL;
+        }
     }
 
-    //Loop and create data for rides/shows
-
+    park->num_rides = rides_size;
+    park->num_shows = shows_size;
     park->rides = &park_rides ;
     park->shows = &park_shows ;
 
+    json_object_put(root);
     return park;
 }
