@@ -25,8 +25,10 @@ struct park {
     double park_exit_probability;
     int num_rides;
     int num_shows;
-    struct ride **rides;
-    struct show **shows;
+    struct ride *rides;
+    struct show *shows;
+
+    double *popularities ;
 } ;
 
 #endif

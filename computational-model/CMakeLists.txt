@@ -5,6 +5,8 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(computational-model 
   src/deserializer/deserializer.c src/deserializer/deserializer.h
+  src/park_simulation/sim_state.c
+  src/park_simulation/behaviors/client_behaviors.c
   src/main.c
 )
 
