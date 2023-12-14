@@ -11,12 +11,14 @@ struct park;
 struct park *deserialize(const char *file) {
     json_object *root = json_object_from_file(file);
     if (!root) {
+        json_object_put(root);
         fprintf(stderr, "Error in opening file %s\n", file) ;
         return NULL;
     }
 
     struct park *park = malloc(sizeof(struct park));
     if (park == NULL) {
+        json_object_put(root);
         fprintf(stderr, "Error when allocating memory for park\n") ;
         return NULL;
     }
@@ -55,6 +57,7 @@ struct park *deserialize(const char *file) {
     } else if (strcmp(patience_distribution, "equilikely") == 0)  {
       park->patience_distribution = EQUILIKELY ;
     } else {
+      json_object_put(root);
       fprintf(stderr, "Error in parsing patience_distribution %s", patience_distribution);
       return NULL;
     }
@@ -69,6 +72,7 @@ struct park *deserialize(const char *file) {
     json_object *curr_ride ;
     struct ride *park_rides = malloc(rides_size * sizeof(struct ride)) ;
     if(park_rides == NULL) {
+        json_object_put(root);
         fprintf(stderr, "Error allocating rides space from file %s\n", file) ;
         return NULL ;
     }
@@ -79,6 +83,7 @@ struct park *deserialize(const char *file) {
         
         char *name = json_object_get_string(ride_name) ;
         if(name == NULL) {
+          json_object_put(root);
             fprintf(stderr, "String field name is  null\n") ;
             return NULL ;
         }
@@ -87,6 +92,7 @@ struct park *deserialize(const char *file) {
         char *name_Allocd ;
 
         if((name_Allocd = malloc(name_len +1)) == NULL) {
+          json_object_put(root);
           fprintf(stderr, "Error allocating spacee for ride name %s\n", file) ;
           return NULL ;
         }
@@ -119,6 +125,7 @@ struct park *deserialize(const char *file) {
         } else if (strcmp(service_distribution, "equilikely") == 0)  {
           park_rides[i].distribution  = EQUILIKELY ;
         } else {
+          json_object_put(root);
           fprintf(stderr, "Error in parsing service_distribution %s", patience_distribution);
           return NULL;
         }
@@ -129,6 +136,7 @@ struct park *deserialize(const char *file) {
     struct show *park_shows = malloc(shows_size * sizeof(struct show)) ;
 
     if(park_shows == NULL) {
+        json_object_put(root);
         fprintf(stderr, "Error allocating shows space from file %s\n", file) ;
         return NULL ;
     }
@@ -138,6 +146,7 @@ struct park *deserialize(const char *file) {
         json_object *show_name = json_object_object_get(curr_show, "name");
         char *name = json_object_get_string(show_name);
         if (name == NULL) {
+          json_object_put(root);
           fprintf(stderr, "String field name is null\n");
           return NULL;
         }
@@ -145,6 +154,7 @@ struct park *deserialize(const char *file) {
 
         char *name_Allocd;
         if ((name_Allocd = malloc(name_len + 1)) == NULL) {
+          json_object_put(root);
           fprintf(stderr, "Error allocating space for show name %s\n", file);
           return NULL;
         }
@@ -172,6 +182,7 @@ struct park *deserialize(const char *file) {
         } else if (strcmp(service_distribution, "equilikely") == 0)  {
           park_shows[i].distribution  = EQUILIKELY ;
         } else {
+          json_object_put(root);
           fprintf(stderr, "Error in parsing service_distribution %s", patience_distribution);
           return NULL;
         }
@@ -181,6 +192,33 @@ struct park *deserialize(const char *file) {
     park->num_shows = shows_size;
     park->rides = &park_rides ;
     park->shows = &park_shows ;
+    double *popularities = malloc((park->num_rides + park->num_shows) * sizeof(double));
+    if (popularities == NULL) {
+      json_object_put(root);
+      fprintf(stderr, "Error allocating popularities");
+      return NULL;
+    }
+    double sum = park->rides[0].popularity;
+    popularities[0] = park->rides[0].popularity;
+    for (int i = 1; i < park->num_rides; i++) {
+        sum += park->rides[i].popularity;
+        popularities[i] = popularities[i-1] + park->rides[i].popularity;
+    }
+    sum += park->shows[0].popularity;
+    popularities[park->num_rides] = popularities[park->num_rides-1] + park->shows[0].popularity;
+    for (int i = 1; i < park->num_shows; i++) {
+        sum += park->shows[i].popularity;
+        popularities[park->num_rides + i] = popularities[park->num_rides + i-1] + park->shows[i].popularity;
+    }
+    if(sum - 1.0 > 0.05) {
+      json_object_put(root);
+      fprintf(stderr, "Invariant error: sum of popularity must be equal to 1\n");
+      return NULL;
+    }
+    else {
+      popularities[park->num_rides + park->num_shows -1] = 1.0 ;
+    }
+    park->popularities = popularities;
 
     json_object_put(root);
     return park;
