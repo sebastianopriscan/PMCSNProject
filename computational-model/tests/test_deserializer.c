@@ -74,56 +74,56 @@ int main(void) {
     fprintf(stderr, "Num shows: expected 1 Got: %d\n", park->num_shows);
     return 1;
   }
-  if(strcmp(park->rides[0]->name, "Name") != 0) {
-    fprintf(stderr, "Park Ride Name: expected Name Got: %s\n", park->rides[0]->name);
+  if(strcmp(park->rides[0].name, "Name") != 0) {
+    fprintf(stderr, "Park Ride Name: expected Name Got: %s\n", park->rides[0].name);
     return 1;
   }
-  if(park->rides[0]->popularity != 0.1) {
-    fprintf(stderr, "Park Ride Popularity: expected 0.1 Got: %f\n", park->rides[0]->popularity);
+  if(park->rides[0].popularity != 0.1) {
+    fprintf(stderr, "Park Ride Popularity: expected 0.1 Got: %f\n", park->rides[0].popularity);
     return 1;
   }
-  if(park->rides[0]->server_num != 1) {
-    fprintf(stderr, "Park Ride Server Num: expected 1 Got: %d\n", park->rides[0]->server_num);
+  if(park->rides[0].server_num != 1) {
+    fprintf(stderr, "Park Ride Server Num: expected 1 Got: %d\n", park->rides[0].server_num);
     return 1;
   }
-  if(park->rides[0]->mean_time != 0.1) {
-    fprintf(stderr, "Park Ride Mean Time: expected 0.1 Got: %f\n", park->rides[0]->mean_time);
+  if(park->rides[0].mean_time != 0.1) {
+    fprintf(stderr, "Park Ride Mean Time: expected 0.1 Got: %f\n", park->rides[0].mean_time);
     return 1;
   }
-  if(park->rides[0]->distribution != NORMAL_DISTRIB) {
-    fprintf(stderr, "Park ride distribution: expected %d. Got: %d\n",NORMAL_DISTRIB, park->rides[0]->distribution);
+  if(park->rides[0].distribution != NORMAL_DISTRIB) {
+    fprintf(stderr, "Park ride distribution: expected %d. Got: %d\n",NORMAL_DISTRIB, park->rides[0].distribution);
     return 1;
   }
-  if(park->rides[0]->mu != 0.1) {
-    fprintf(stderr, "Park ride mu: expected 0.1. Got: %f\n", park->rides[0]->mu);
+  if(park->rides[0].mu != 0.1) {
+    fprintf(stderr, "Park ride mu: expected 0.1. Got: %f\n", park->rides[0].mu);
     return 1;
   }
-  if(park->rides[0]->sigma != 0.1) {
-    fprintf(stderr, "Park ride sigma: expected 0.1. Got: %f\n", park->rides[0]->sigma);
+  if(park->rides[0].sigma != 0.1) {
+    fprintf(stderr, "Park ride sigma: expected 0.1. Got: %f\n", park->rides[0].sigma);
     return 1;
   }
-  if(strcmp(park->shows[0]->name, "Name") != 0) {
-    fprintf(stderr, "Park show name: expected Name. Got: %s\n", park->shows[0]->name);
+  if(strcmp(park->shows[0].name, "Name") != 0) {
+    fprintf(stderr, "Park show name: expected Name. Got: %s\n", park->shows[0].name);
     return 1;
   }
-  if(park->shows[0]->popularity != 0.1) {
-    fprintf(stderr, "Park show popularity: expected 0.1. Got: %f\n", park->shows[0]->popularity);
+  if(park->shows[0].popularity != 0.1) {
+    fprintf(stderr, "Park show popularity: expected 0.1. Got: %f\n", park->shows[0].popularity);
     return 1;
   }
-  if(park->shows[0]->mean_time != 0.1) {
-    fprintf(stderr, "Park show mean time: expected  Got: %f\n", park->shows[0]->mean_time);
+  if(park->shows[0].mean_time != 0.1) {
+    fprintf(stderr, "Park show mean time: expected  Got: %f\n", park->shows[0].mean_time);
     return 1;
   }
-  if(park->shows[0]->distribution != NORMAL_DISTRIB) {
-    fprintf(stderr, "Park show mu: expected %d. Got: %d\n", NORMAL_DISTRIB, park->shows[0]->distribution);
+  if(park->shows[0].distribution != NORMAL_DISTRIB) {
+    fprintf(stderr, "Park show mu: expected %d. Got: %d\n", NORMAL_DISTRIB, park->shows[0].distribution);
     return 1;
   }
-  if(park->shows[0]->mu != 0.1) {
-    fprintf(stderr, "Park show mu: expected 0.1. Got: %f\n", park->shows[0]->mu);
+  if(park->shows[0].mu != 0.1) {
+    fprintf(stderr, "Park show mu: expected 0.1. Got: %f\n", park->shows[0].mu);
     return 1;
   }
-  if(park->shows[0]->sigma != 0.1) {
-    fprintf(stderr, "Show sigma: expected 0.1. Got: %f\n", park->shows[0]->sigma);
+  if(park->shows[0].sigma != 0.1) {
+    fprintf(stderr, "Show sigma: expected 0.1. Got: %f\n", park->shows[0].sigma);
     return 1;
   }
   return 0;

@@ -24,9 +24,11 @@ struct sim_state *create_sim_state(struct park *park) {
         rides[i].stat_vip_clients = 0;
         rides[i].stat_normal_clients = 0;
         rides[i].busy_servers = malloc(park->rides[i].server_num);
-        if (rides[i].busy_servers == NULL) {
+        rides[i].vip_queue = create_queue_list();
+        rides[i].normal_queue = create_queue_list();
+        if (rides[i].busy_servers == NULL || rides[i].normal_queue == NULL || rides[i].vip_queue == NULL) {
             fprintf(stderr, "Error allocating busy_servers for %d\n", i);
-            for(int j = 0; j < i ; j++)
+            for(int j = 0; j < i ; j++) 
                 free(rides[i].busy_servers) ;
             free(rides);
             free(retVal);
@@ -41,6 +43,8 @@ struct sim_state *create_sim_state(struct park *park) {
     if (shows == NULL) {
         for(int i = 0; i < park->num_rides; i++) {
             free(retVal->rides[i].busy_servers);
+            destroy_generic_queue_list(rides[i].normal_queue) ;
+            destroy_generic_queue_list(rides[i].vip_queue) ;
         }
         free(retVal->rides);
         free(retVal);
@@ -55,6 +59,8 @@ struct sim_state *create_sim_state(struct park *park) {
     if (retVal->clients == NULL) {
         for(int i = 0; i < park->num_rides; i++) {
             free(retVal->rides[i].busy_servers);
+            destroy_generic_queue_list(rides[i].normal_queue) ;
+            destroy_generic_queue_list(rides[i].vip_queue) ;
         }
         free(retVal->rides);
         free(retVal->shows);
@@ -78,6 +84,8 @@ struct sim_state *create_sim_state(struct park *park) {
 void delete_sim_state(struct sim_state *state) {
     for (int i = 0; i < state->park->num_rides; i++) {
         free(state->rides[i].busy_servers);
+        destroy_generic_queue_list(state->rides[i].vip_queue) ;
+        destroy_generic_queue_list(state->rides[i].normal_queue) ;
     }
     destroy_generic_queue_list(state->clients) ;
     free(state->rides);

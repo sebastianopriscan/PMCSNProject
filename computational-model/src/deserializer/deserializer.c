@@ -54,8 +54,8 @@ struct park *deserialize(const char *file) {
       park->patience_distribution = NORMAL_DISTRIB;
     } else if (strcmp(patience_distribution, "exponential") == 0) {
       park->patience_distribution = EXPONENTIAL;
-    } else if (strcmp(patience_distribution, "equilikely") == 0)  {
-      park->patience_distribution = EQUILIKELY ;
+    } else if (strcmp(patience_distribution, "uniform") == 0)  {
+      park->patience_distribution = UNIFORM ;
     } else {
       json_object_put(root);
       fprintf(stderr, "Error in parsing patience_distribution %s", patience_distribution);
@@ -122,8 +122,8 @@ struct park *deserialize(const char *file) {
           park_rides[i].distribution = NORMAL_DISTRIB;
         } else if (strcmp(service_distribution, "exponential") == 0) {
           park_rides[i].distribution = EXPONENTIAL;
-        } else if (strcmp(service_distribution, "equilikely") == 0)  {
-          park_rides[i].distribution  = EQUILIKELY ;
+        } else if (strcmp(service_distribution, "uniform") == 0)  {
+          park_rides[i].distribution  = UNIFORM ;
         } else {
           json_object_put(root);
           fprintf(stderr, "Error in parsing service_distribution %s", patience_distribution);
@@ -179,8 +179,8 @@ struct park *deserialize(const char *file) {
           park_shows[i].distribution = NORMAL_DISTRIB;
         } else if (strcmp(service_distribution, "exponential") == 0) {
           park_shows[i].distribution = EXPONENTIAL;
-        } else if (strcmp(service_distribution, "equilikely") == 0)  {
-          park_shows[i].distribution  = EQUILIKELY ;
+        } else if (strcmp(service_distribution, "uniform") == 0)  {
+          park_shows[i].distribution  = UNIFORM ;
         } else {
           json_object_put(root);
           fprintf(stderr, "Error in parsing service_distribution %s", patience_distribution);
@@ -190,8 +190,8 @@ struct park *deserialize(const char *file) {
 
     park->num_rides = rides_size;
     park->num_shows = shows_size;
-    park->rides = &park_rides ;
-    park->shows = &park_shows ;
+    park->rides = park_rides ;
+    park->shows = park_shows ;
     double *popularities = malloc((park->num_rides + park->num_shows) * sizeof(double));
     if (popularities == NULL) {
       json_object_put(root);

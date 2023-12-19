@@ -15,6 +15,8 @@ struct ride_state {
   double total_delay_vip;
 
   char *busy_servers ;
+  struct generic_queue_list *vip_queue;
+  struct generic_queue_list *normal_queue;
 };
 
 struct show_state {

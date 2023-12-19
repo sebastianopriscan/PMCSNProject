@@ -12,7 +12,7 @@ enum client_privilege {
 
 struct client {
     enum client_privilege type ;
-    double patience ;
+    double patience_mu ;
 } ;
 
 #endif
