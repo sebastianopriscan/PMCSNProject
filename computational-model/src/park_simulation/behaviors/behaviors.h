@@ -35,6 +35,11 @@ void patience_lost(struct simulation* sim, void *metadata);
 void ride_server_activate(struct simulation* sim, void *metadata);
 
 // metadata: struct client_event *
-void show_server_activate(struct simulation* sim, void *metadata);
+void reach_show(struct simulation* sim, void *metadata);
 
+// metadata : int (show to activate)
+void show_activate(struct simulation * sim, void *metadata);
+
+// metadata : int (show to deactivate)
+void show_deactivate(struct simulation *sim, void *metadata);
 #endif

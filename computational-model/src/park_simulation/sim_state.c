@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <generic_queue.h>
 
@@ -20,6 +21,7 @@ struct sim_state *create_sim_state(struct park *park) {
         fprintf(stderr, "Error allocating rides\n");
         return NULL;
     }
+    retVal->rides_popularity_total = 0.0 ;
     for(int i = 0; i < park->num_rides; i++) {
         rides[i].stat_vip_clients = 0;
         rides[i].stat_normal_clients = 0;
@@ -36,6 +38,8 @@ struct sim_state *create_sim_state(struct park *park) {
         }
         for(int j = 0 ; j < park->rides[i].server_num ; j++)
             rides[i].busy_servers = 0 ;
+
+        retVal->rides_popularity_total += park->rides[i].popularity ;
     }
     retVal->rides = rides;
 
@@ -68,6 +72,21 @@ struct sim_state *create_sim_state(struct park *park) {
         fprintf(stderr, "Error allocating clients generic queues\n");
         return NULL;
     }
+
+    retVal->active_shows = malloc(park->num_shows);
+    if (retVal->active_shows == NULL) {
+        for(int i = 0; i < park->num_rides; i++) {
+            free(retVal->rides[i].busy_servers);
+            destroy_generic_queue_list(rides[i].normal_queue) ;
+            destroy_generic_queue_list(rides[i].vip_queue) ;
+        }
+        free(retVal->rides);
+        free(retVal->shows);
+        free(retVal);
+        fprintf(stderr, "Error allocating active shows\n");
+        return NULL;
+    }
+    memset(retVal->active_shows, 0, park->num_shows);
     
     retVal->stat_vip_clients = 0 ;
     retVal->stat_normal_clients = 0;
@@ -78,6 +97,24 @@ struct sim_state *create_sim_state(struct park *park) {
     retVal->total_service_time_vip = 0.0;
     retVal->total_delay_normal  = 0.0;
     retVal->total_delay_vip = 0.0;
+    retVal->num_active_shows = 0;
+    retVal->popularities = malloc((park->num_rides + park->num_shows) * sizeof(double));
+
+    if(retVal->popularities == NULL) {
+        fprintf(stderr, "Error in allocating popularities array\n") ;
+        for(int i = 0; i < park->num_rides; i++) {
+            free(retVal->rides[i].busy_servers);
+            destroy_generic_queue_list(rides[i].normal_queue) ;
+            destroy_generic_queue_list(rides[i].vip_queue) ;
+        }
+        free(retVal->rides);
+        free(retVal->shows);
+        free(retVal->active_shows);
+        free(retVal);
+        fprintf(stderr, "Error allocating active shows\n");
+        return NULL ;
+    }
+
     return retVal;
 }
 
@@ -90,5 +127,26 @@ void delete_sim_state(struct sim_state *state) {
     destroy_generic_queue_list(state->clients) ;
     free(state->rides);
     free(state->shows);
+    free(state->active_shows);
+    free(state->popularities);
     free(state);
+}
+
+void evaluate_attraction_probabilities(struct sim_state *state) {
+  double sum_open_popularities = state->rides_popularity_total;
+  for (int i = 0; i < state->park->num_shows; i++) {
+    if(state->active_shows[i] == 1) sum_open_popularities += state->park->shows[i].popularity;
+  }
+
+  double residual = (1 - sum_open_popularities) / sum_open_popularities;
+  state->popularities[0] = state->park->rides[0].popularity * (1 + residual);
+  for (int i = 1; i < state->park->num_rides; i++) {
+    state->popularities[i] = state->popularities[i-1] + state->park->rides[i].popularity * (1 + residual);
+  }
+  int current_idx = state->park->num_rides;
+  for (int i = 0; i < state->park->num_shows; i++) {
+    if(state->active_shows[i] == 0) continue;
+    state->popularities[current_idx] = state->popularities[current_idx - 1] + state->park->shows[i].popularity * (1 + residual);
+    current_idx++;
+  }
 }

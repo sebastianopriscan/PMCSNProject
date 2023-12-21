@@ -30,8 +30,6 @@ struct park {
     int num_shows;
     struct ride *rides;
     struct show *shows;
-
-    double *popularities ;
 } ;
 
 #endif

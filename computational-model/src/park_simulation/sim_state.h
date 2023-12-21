@@ -46,9 +46,14 @@ struct sim_state {
 
   struct ride_state *rides ;
   struct show_state *shows;
+  double rides_popularity_total ;
+  int num_active_shows;
+  double *popularities;
+  char *active_shows;
 };
 
 struct sim_state *create_sim_state(struct park *park) ;
 void delete_sim_state(struct sim_state *state);
+void evaluate_attraction_probabilities(struct sim_state *state);
 
 #endif

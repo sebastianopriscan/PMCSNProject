@@ -226,34 +226,21 @@ struct park *deserialize(const char *file) {
     park->num_shows = shows_size;
     park->rides = park_rides ;
     park->shows = park_shows ;
-    double *popularities = malloc((park->num_rides + park->num_shows) * sizeof(double));
-    if (popularities == NULL) {
-      json_object_put(root);
-      fprintf(stderr, "Error allocating popularities");
-      return NULL;
-    }
-    double sum = park->rides[0].popularity;
-    popularities[0] = park->rides[0].popularity;
-    for (int i = 1; i < park->num_rides; i++) {
-        sum += park->rides[i].popularity;
-        popularities[i] = popularities[i-1] + park->rides[i].popularity;
-    }
-    sum += park->shows[0].popularity;
-    popularities[park->num_rides] = popularities[park->num_rides-1] + park->shows[0].popularity;
-    for (int i = 1; i < park->num_shows; i++) {
-        sum += park->shows[i].popularity;
-        popularities[park->num_rides + i] = popularities[park->num_rides + i-1] + park->shows[i].popularity;
-    }
-    if(sum - 1.0 > 0.05) {
-      json_object_put(root);
-      fprintf(stderr, "Invariant error: sum of popularity must be equal to 1\n");
-      return NULL;
-    }
-    else {
-      popularities[park->num_rides + park->num_shows -1] = 1.0 ;
-    }
-    park->popularities = popularities;
 
     json_object_put(root);
+
+    double sum = 0.0;
+    for (int i = 0; i < park->num_rides; i++) {
+      sum += park->rides[i].popularity;
+    }
+    for (int i = 0; i < park->num_shows; i++) {
+      sum += park->shows[i].popularity;
+    }
+    if (sum - 1.0 > 0.05) {
+      json_object_put(root);
+      fprintf(stderr, "Invariant error: sum of all the probabilities must be equal to 1\n");
+      return NULL;
+    }
+
     return park;
 }

@@ -24,12 +24,11 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   int selected_ride_idx = -1;
   double p = GetRandomFromDistributionType(2, UNIFORM, 0, 1);
 
-  if (p < state->park->popularities[0])
+  if (p < state->popularities[0])
     selected_ride_idx = 0;
   else {
-    for (int i = 1; i < state->park->num_rides + state->park->num_shows; i++) {
-      if (state->park->popularities[i - 1] < p &&
-          p < state->park->popularities[i]) {
+    for (int i = 1; i < state->num_active_shows; i++) {
+      if (state->popularities[i - 1] < p && p < state->popularities[i]) {
         selected_ride_idx = i;
       }
     }
@@ -110,9 +109,9 @@ void reach_park(struct simulation *sim, void *metadata) {
   add_event_to_simulation(sim, event, 0);
 }
 
-//TODO : Finalize implementation starting from json attribute
 void choose_delay(struct simulation* sim, void *metadata) {
-  double delay = 0.0;
+  struct sim_state *state = (struct sim_state *)sim->state;
+  double delay = GetRandomFromDistributionType(0, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
   struct event *event = createEvent(sim->clock + delay, choose_attraction, NULL, metadata);
   add_event_to_simulation(sim, event, 0);
 }
