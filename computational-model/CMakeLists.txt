@@ -7,6 +7,8 @@ add_executable(computational-model
   src/deserializer/deserializer.c src/deserializer/deserializer.h
   src/park_simulation/sim_state.c
   src/park_simulation/behaviors/client_behaviors.c
+  src/park_simulation/behaviors/ride_behaviors.c
+  src/park_simulation/behaviors/show_behaviors.c
   src/models/utils.c
   src/main.c
 )

@@ -5,20 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct client_event {
-  struct client *client;
-  struct event *event;
-  int selected_ride_idx;
-};
-
 void patience_lost(struct simulation *sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
   struct client_event *client_event = (struct client_event *)metadata;
 
   if (client_event->client->type == VIP) {
-    generic_remove_element(state->rides[client_event->selected_ride_idx].vip_queue, client_event);
+    generic_remove_element(state->rides[client_event->selected_attraction_idx].vip_queue, client_event);
   } else {
-    generic_remove_element(state->rides[client_event->selected_ride_idx].normal_queue, client_event);
+    generic_remove_element(state->rides[client_event->selected_attraction_idx].normal_queue, client_event);
   }
   struct event *event = createEvent(sim->clock, choose_attraction, NULL, client_event->client);
   add_event_to_simulation(sim, event, 0);
@@ -54,7 +48,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
     exit(1);
   }
   client_ev->client = me;
-  client_ev->selected_ride_idx = selected_ride_idx;
+  client_ev->selected_attraction_idx = selected_ride_idx;
 
   // NOTE: check for patience sigma
   double patience = GetRandomFromDistributionType(0, NORMAL_DISTRIB, me->patience_mu, me->patience_mu * 0.1);
@@ -66,6 +60,14 @@ void choose_attraction(struct simulation *sim, void *metadata) {
     generic_enqueue_element(state->rides[selected_ride_idx].vip_queue, client_ev);
   } else {
     generic_enqueue_element(state->rides[selected_ride_idx].normal_queue, client_ev);
+  }
+
+  for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
+  {
+    if (state->rides[selected_ride_idx].busy_servers[i] == 0) {
+      struct event *activate_server = createEvent(sim->clock, ride_server_activate, NULL, (void *) selected_ride_idx);
+      add_event_to_simulation(sim, activate_server, selected_ride_idx);
+    }
   }
 }
 
@@ -104,10 +106,13 @@ void reach_park(struct simulation *sim, void *metadata) {
     exit(1);
   }
 
-  /*
-    TODO : Check if adding a delay in going to a ride/show affects theoretical
-    results
-  */
-  struct event *event = createEvent(sim->clock, choose_attraction, NULL, me);
+  struct event *event = createEvent(sim->clock, choose_delay, NULL, me);
+  add_event_to_simulation(sim, event, 0);
+}
+
+//TODO : Finalize implementation starting from json attribute
+void choose_delay(struct simulation* sim, void *metadata) {
+  double delay = 0.0;
+  struct event *event = createEvent(sim->clock + delay, choose_attraction, NULL, metadata);
   add_event_to_simulation(sim, event, 0);
 }
