@@ -7,6 +7,9 @@
     "vip_ticket_price": 1,
     "normal_ticket_price": 1,
     "number_of_clients": 1,
+    "delay_distribution": "normal",
+    "delay_mu": 0.1,
+    "delay_sigma": 0.1,
     "patience_distribution": "normal",
     "patience_mu": 0.1,
     "patience_sigma": 0.1,
@@ -32,7 +35,11 @@
         "mean_time": 0.1,
         "service_distribution": "normal",
         "mu": 0.1,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "length": 30,
+        "starting_times": [
+          120, 180, 300, 360
+        ]
       }
     ]
 }

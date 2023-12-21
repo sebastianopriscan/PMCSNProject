@@ -33,6 +33,9 @@ struct park *deserialize(const char *file) {
     json_object *vip_ticket_price_json = json_object_object_get(root, "vip_ticket_price");
     json_object *normal_ticket_price_json = json_object_object_get(root, "normal_ticket_price");
     json_object *number_of_clients_json = json_object_object_get(root, "number_of_clients");
+    json_object *delay_distribution_json = json_object_object_get(root, "delay_distribution");
+    json_object *delay_mu_json = json_object_object_get(root, "delay_mu");
+    json_object *delay_sigma_json = json_object_object_get(root, "delay_sigma");
     json_object *patience_distribution_json = json_object_object_get(root, "patience_distribution");
     json_object *patience_mu_json = json_object_object_get(root, "patience_mu");
     json_object *patience_sigma_json = json_object_object_get(root, "patience_sigma");
@@ -49,6 +52,20 @@ struct park *deserialize(const char *file) {
     park->vip_ticket_price = json_object_get_int(vip_ticket_price_json);
     park->normal_ticket_price = json_object_get_int(normal_ticket_price_json);
     park->number_of_clients = json_object_get_int(number_of_clients_json);
+    char* delay_distribution = json_object_get_string(delay_distribution_json);
+    if(strcmp(delay_distribution, "normal") == 0) {
+      park->delay_distribution = NORMAL_DISTRIB;
+    } else if (strcmp(delay_distribution, "exponential") == 0) {
+      park->delay_distribution = EXPONENTIAL;
+    } else if (strcmp(delay_distribution, "uniform") == 0)  {
+      park->delay_distribution = UNIFORM ;
+    } else {
+      json_object_put(root);
+      fprintf(stderr, "Error in parsing delay_distribution %s", delay_distribution);
+      return NULL;
+    }
+    park->delay_mu = json_object_get_double(delay_mu_json);
+    park->delay_sigma = json_object_get_double(delay_sigma_json);
     char* patience_distribution = json_object_get_string(patience_distribution_json);
     if(strcmp(patience_distribution, "normal") == 0) {
       park->patience_distribution = NORMAL_DISTRIB;
@@ -186,6 +203,23 @@ struct park *deserialize(const char *file) {
           fprintf(stderr, "Error in parsing service_distribution %s", patience_distribution);
           return NULL;
         }
+
+        json_object *length_json = json_object_object_get(curr_show, "length");
+        park_shows[i].length = json_object_get_double(length_json);
+        json_object *starting_times_json = json_object_object_get(curr_show, "starting_times");
+        park_shows[i].num_starting_times = json_object_array_length(starting_times_json);
+        double *starting_times = malloc(park_shows[i].num_starting_times * sizeof(double));
+        if (starting_times == NULL) {
+          json_object_put(root);
+          return NULL;
+        }
+        json_object *curr_starting_time;
+        for (int j = 0; j < park_shows[i].num_starting_times; j++) {
+          curr_starting_time = json_object_array_get_idx(starting_times_json, 
+          j);
+          starting_times[j] = json_object_get_double(curr_starting_time);
+        }
+        park_shows[i].starting_times = starting_times;
     }
 
     park->num_rides = rides_size;

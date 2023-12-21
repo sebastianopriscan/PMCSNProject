@@ -126,5 +126,20 @@ int main(void) {
     fprintf(stderr, "Show sigma: expected 0.1. Got: %f\n", park->shows[0].sigma);
     return 1;
   }
+  if(park->shows[0].length != 30.0) {
+    fprintf(stderr, "Show length: expected 30. Got: %f\n", park->shows[0].length);
+    return 1;
+  }
+  if(park->shows[0].num_starting_times != 4) {
+    fprintf(stderr, "Show num starting times: expected 4. Got: %d\n", park->shows[0].num_starting_times);
+    return 1;
+  }
+  if(park->shows[0].starting_times[0] != 120.0 
+    || park->shows[0].starting_times[1] != 180.0 
+    || park->shows[0].starting_times[2] != 300.0 
+    || park->shows[0].starting_times[3] != 360.0) {
+    fprintf(stderr, "Show starting times: invalid values\n");
+    return 1;
+  }
   return 0;
 }

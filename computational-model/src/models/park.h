@@ -16,6 +16,9 @@ struct park {
     int vip_ticket_price ;
     int normal_ticket_price ;
     int number_of_clients ;
+    enum distribution_type delay_distribution;
+    double delay_mu;
+    double delay_sigma;
     enum distribution_type patience_distribution;
     double patience_mu;
     double patience_sigma;

@@ -1,5 +1,6 @@
 #include "behaviors.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 void ride_server_activate(struct simulation *sim, void *metadata)
 {
@@ -44,8 +45,8 @@ void ride_server_activate(struct simulation *sim, void *metadata)
 
   double next = sim->clock + service_time;
 
-  struct event* event = createEvent(next, ride_server_activate, NULL, metadata);
-  add_event_to_simulation(sim, event, 0);
+  struct event* next_server_activate_event = createEvent(next, ride_server_activate, NULL, metadata);
+  add_event_to_simulation(sim, next_server_activate_event, 0);
   struct event* choose_delay_event = createEvent(next, choose_delay, NULL, me);
   add_event_to_simulation(sim, choose_delay_event, 0);
 }

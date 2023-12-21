@@ -16,6 +16,9 @@ struct show {
   enum distribution_type distribution;
   double mu;
   double sigma;
+  double length;
+  int num_starting_times;
+  double *starting_times;
 };
 
 #endif 
