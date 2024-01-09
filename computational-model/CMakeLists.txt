@@ -3,14 +3,14 @@ project(computational-model C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(computational-model 
-  src/deserializer/deserializer.c src/deserializer/deserializer.h
+add_library(computational-model 
+  src/deserializer/deserializer.c
   src/park_simulation/sim_state.c
   src/park_simulation/behaviors/client_behaviors.c
   src/park_simulation/behaviors/ride_behaviors.c
   src/park_simulation/behaviors/show_behaviors.c
+  src/park_simulation/run_simulation.c
   src/models/utils.c
-  src/main.c
 )
 
 # Required as the json.h header file is automatically generated during build

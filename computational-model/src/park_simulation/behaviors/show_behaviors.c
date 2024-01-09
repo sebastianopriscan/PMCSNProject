@@ -20,7 +20,7 @@ void show_activate(struct simulation * sim, void *metadata) {
   state->num_active_shows += 1;
   evaluate_attraction_probabilities(state);
   struct event* event = createEvent(sim->clock + state->park->shows[idx].length, show_deactivate, NULL, metadata);
-  add_event_to_simulation(sim, event, 0);
+  add_event_to_simulation(sim, event, 1);
 }
 
 void show_deactivate(struct simulation *sim, void *metadata) {
