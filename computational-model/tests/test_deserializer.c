@@ -62,8 +62,8 @@ int main(void) {
     fprintf(stderr, "Park Next Reschedule Rate: expected 0.1 Got: %f\n", park->park_next_reschedule_rate);
     return 1;
   }
-  if(park->park_exit_probability != 0.01) {
-    fprintf(stderr, "Park Exit Probability: expected 0.1 Got: %f\n", park->park_exit_probability);
+  if(park->park_exit_rate != 0.01) {
+    fprintf(stderr, "Park Exit Rate: expected 0.1 Got: %f\n", park->park_exit_rate);
     return 1;
   }
   if(park->num_rides != 1) {

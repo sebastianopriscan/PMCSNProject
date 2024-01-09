@@ -24,8 +24,8 @@ struct park {
     double patience_sigma;
     int max_group_size;
     double park_arrival_rate;
-    double park_next_reschedule_rate;
-    double park_exit_probability;
+    double park_next_reschedule_rate; // NOTE: check if it is useful
+    double park_exit_rate;
     int num_rides;
     int num_shows;
     struct ride *rides;
