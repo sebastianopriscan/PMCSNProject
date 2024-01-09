@@ -13,12 +13,19 @@ struct client_event {
 struct ride_metadata {
   int ride_idx ;
   int server_idx ;
+  int queue_index;
 };
 
 // Client Behaviors
 
 // metadata : unused
 void reach_park(struct simulation *sim, void *metadata);
+
+// metadata : unused
+void next_reach(struct simulation *sim, void *metadata);
+
+// metadata : struct client *
+void client_exit_trigger(struct simulation *sim, void *metadata) ;
 
 // metadata :  struct client *
 void choose_delay(struct simulation* sim, void *metadata);

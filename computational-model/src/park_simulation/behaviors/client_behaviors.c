@@ -63,16 +63,31 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   }
 
   if (selected_ride_idx >= state->park->num_rides) {
-    struct event *activate_server = createEvent(sim->clock, reach_show, NULL, (void *)selected_ride_idx);
-    add_event_to_simulation(sim, activate_server, selected_ride_idx);
+    struct event *reach_show_event = createEvent(sim->clock, reach_show, NULL, (void *)selected_ride_idx);
+    add_event_to_simulation(sim, reach_show_event, 1);
     return;
   }
 
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
   {
     if (state->rides[selected_ride_idx].busy_servers[i] == 0) {
-      struct event *activate_server = createEvent(sim->clock, ride_server_activate, NULL, (void *) selected_ride_idx);
-      add_event_to_simulation(sim, activate_server, selected_ride_idx);
+      
+      int queue_index = 2;
+      for (int j = 0; j < selected_ride_idx; j++) {
+        queue_index += state->park->rides[j].server_num;
+      }
+      
+      struct ride_metadata *rideMetadata = malloc(sizeof(struct ride_metadata)) ;
+      if(rideMetadata == NULL) {
+        fprintf(stderr, "Error in allocating memory for ride metadata, exiting...\n") ;
+        exit(1) ;
+      }
+      rideMetadata->ride_idx = selected_ride_idx;
+      rideMetadata->server_idx = i;
+      rideMetadata->queue_index = queue_index;
+
+      struct event *activate_server = createEvent(sim->clock, ride_server_activate, NULL, (void *) rideMetadata);
+      add_event_to_simulation(sim, activate_server, queue_index + i);
     }
   }
 }
@@ -86,6 +101,7 @@ void reach_park(struct simulation *sim, void *metadata) {
     exit(1);
   }
 
+  me->should_exit = 0;
   double patience_mu = GetRandomFromDistributionType(0, state->park->patience_distribution, state->park->patience_mu, state->park->patience_sigma);
   double p = GetRandomFromDistributionType(1, UNIFORM, 0, 1);
 
@@ -114,10 +130,30 @@ void reach_park(struct simulation *sim, void *metadata) {
 
   struct event *event = createEvent(sim->clock, choose_delay, NULL, me);
   add_event_to_simulation(sim, event, 0);
+
+  double exit_time = GetRandomFromDistributionType(0, EXPONENTIAL, state->park->park_exit_rate, 0);
+  struct event *exit_event = createEvent(sim->clock + exit_time, client_exit_trigger, NULL, me);
+  add_event_to_simulation(sim, event, 0);
+}
+
+void client_exit_trigger(struct simulation *sim, void *metadata) {
+  ((struct client *) metadata)->should_exit = 1 ;
+}
+
+void next_reach(struct simulation *sim, void *metadata) {
+  struct sim_state*state = (struct sim_state*)sim->state;
+  double next = GetRandomFromDistributionType(0, EXPONENTIAL, state->park->park_arrival_rate, 0);
+  struct event* event = createEvent(sim->clock + next, reach_park, next_reach, NULL);
+  add_event_to_simulation(sim, event, 0);
 }
 
 void choose_delay(struct simulation* sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
+  struct client *client = (struct client *) metadata ;
+  if(client->should_exit) {
+    free(client) ;
+    return ;
+  }
   double delay = GetRandomFromDistributionType(0, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
   struct event *event = createEvent(sim->clock + delay, choose_attraction, NULL, metadata);
   add_event_to_simulation(sim, event, 0);
