@@ -140,13 +140,12 @@ void evaluate_attraction_probabilities(struct sim_state *state) {
 
   double residual = (1 - sum_open_popularities) / sum_open_popularities;
   state->popularities[0] = state->park->rides[0].popularity * (1 + residual);
-  for (int i = 1; i < state->park->num_rides; i++) {
+  for (int i = 1; i < state->park->num_rides + state->park->num_shows; i++) {
+    // If it is a show and it is deactivated, copy the previous value 
+    if (i >= state->park->num_rides && state->active_shows[i - state->park->num_rides] == 0) {
+        state->popularities[i] = state->popularities[i-1];
+        continue;
+    }
     state->popularities[i] = state->popularities[i-1] + state->park->rides[i].popularity * (1 + residual);
-  }
-  int current_idx = state->park->num_rides;
-  for (int i = 0; i < state->park->num_shows; i++) {
-    if(state->active_shows[i] == 0) continue;
-    state->popularities[current_idx] = state->popularities[current_idx - 1] + state->park->shows[i].popularity * (1 + residual);
-    current_idx++;
   }
 }

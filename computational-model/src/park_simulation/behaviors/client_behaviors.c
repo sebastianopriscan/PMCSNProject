@@ -24,12 +24,13 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   int selected_ride_idx = -1;
   double p = GetRandomFromDistributionType(2, UNIFORM, 0, 1);
 
-  if (p < state->popularities[0])
+  if (p <= state->popularities[0])
     selected_ride_idx = 0;
   else {
-    for (int i = 1; i < state->num_active_shows; i++) {
-      if (state->popularities[i - 1] < p && p < state->popularities[i]) {
+    for (int i = 1; i < state->park->num_rides + state->park->num_shows; i++) {
+      if (state->popularities[i - 1] <= p && p <= state->popularities[i]) {
         selected_ride_idx = i;
+        break;
       }
     }
   }
@@ -59,6 +60,12 @@ void choose_attraction(struct simulation *sim, void *metadata) {
     generic_enqueue_element(state->rides[selected_ride_idx].vip_queue, client_ev);
   } else {
     generic_enqueue_element(state->rides[selected_ride_idx].normal_queue, client_ev);
+  }
+
+  if (selected_ride_idx >= state->park->num_rides) {
+    struct event *activate_server = createEvent(sim->clock, reach_show, NULL, (void *)selected_ride_idx);
+    add_event_to_simulation(sim, activate_server, selected_ride_idx);
+    return;
   }
 
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
