@@ -3,6 +3,7 @@
 #include "../models/model.h"
 #include "../deserializer/deserializer.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 int run_park_simulation(const char *path) {
@@ -14,7 +15,7 @@ int run_park_simulation(const char *path) {
   for (int i = 0; i < park->num_rides; i++) {
     num_queues += park->rides[i].server_num;
   }
-  
+
 
   struct sim_state* sim_state = create_sim_state(park);
   struct simulation* sim = create_simulation(num_queues, park->simulation_time, sim_state);
@@ -29,6 +30,10 @@ int run_park_simulation(const char *path) {
     }
   }
   run_simulation(sim);
+  printf("Number of total clients: %d\n", sim_state->total_clients);
+  printf("Number of total clients exited: %d\n", sim_state->total_clients_exited);
+  delete_sim_state(sim->state);
+  destroy_simulation(sim);
   
   return 0;
 }

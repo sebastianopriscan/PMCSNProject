@@ -34,6 +34,8 @@ struct sim_state {
   int available_vip_tickets ;
 
   // Statistics
+  unsigned int total_clients;
+  unsigned int total_clients_exited;
   unsigned int stat_vip_clients;
   unsigned int stat_normal_clients;
 

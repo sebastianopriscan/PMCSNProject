@@ -13,6 +13,8 @@ struct sim_state *create_sim_state(struct park *park) {
         fprintf(stderr, "Error allocating simulation state.\n") ;
         return NULL ;
     }
+    retVal->total_clients = 0;
+    retVal->total_clients_exited = 0;
 
     retVal->park = park ;
     struct ride_state* rides = malloc(park->num_rides * sizeof(struct ride_state));
@@ -25,7 +27,7 @@ struct sim_state *create_sim_state(struct park *park) {
     for(int i = 0; i < park->num_rides; i++) {
         rides[i].stat_vip_clients = 0;
         rides[i].stat_normal_clients = 0;
-        rides[i].busy_servers = malloc(park->rides[i].server_num);
+        rides[i].busy_servers = malloc(sizeof(char)*park->rides[i].server_num);
         rides[i].vip_queue = create_queue_list();
         rides[i].normal_queue = create_queue_list();
         if (rides[i].busy_servers == NULL || rides[i].normal_queue == NULL || rides[i].vip_queue == NULL) {
@@ -36,8 +38,7 @@ struct sim_state *create_sim_state(struct park *park) {
             free(retVal);
             return NULL;
         }
-        for(int j = 0 ; j < park->rides[i].server_num ; j++)
-            rides[i].busy_servers = 0 ;
+        memset(rides[i].busy_servers, 0, park->rides[i].server_num);
 
         retVal->rides_popularity_total += park->rides[i].popularity ;
     }
@@ -114,6 +115,7 @@ struct sim_state *create_sim_state(struct park *park) {
         fprintf(stderr, "Error allocating active shows\n");
         return NULL ;
     }
+    evaluate_attraction_probabilities(retVal);
 
     return retVal;
 }

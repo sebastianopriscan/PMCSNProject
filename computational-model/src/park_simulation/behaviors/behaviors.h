@@ -25,7 +25,7 @@ void reach_park(struct simulation *sim, void *metadata);
 void next_reach(struct simulation *sim, void *metadata);
 
 // metadata : struct client *
-void client_exit_trigger(struct simulation *sim, void *metadata) ;
+// void client_exit_trigger(struct simulation *sim, void *metadata) ;
 
 // metadata :  struct client *
 void choose_delay(struct simulation* sim, void *metadata);

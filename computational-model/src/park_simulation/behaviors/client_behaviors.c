@@ -8,13 +8,15 @@
 void patience_lost(struct simulation *sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
   struct client_event *client_event = (struct client_event *)metadata;
+  struct client* client = client_event->client;
 
   if (client_event->client->type == VIP) {
     generic_remove_element(state->rides[client_event->selected_attraction_idx].vip_queue, client_event);
   } else {
     generic_remove_element(state->rides[client_event->selected_attraction_idx].normal_queue, client_event);
   }
-  struct event *event = createEvent(sim->clock, choose_attraction, NULL, client_event->client);
+  free(client_event);
+  struct event *event = createEvent(sim->clock, choose_attraction, NULL, client);
   add_event_to_simulation(sim, event, 0);
 }
 
@@ -36,7 +38,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   }
 
   if (selected_ride_idx == -1) {
-    fprintf(stderr, "Fatal error in selecting ride, exiting...\n");
+    fprintf(stderr, "Fatal error in selecting ride (sim clock: %f), exiting...\n", sim->clock);
     exit(1);
   }
 
@@ -49,23 +51,26 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   }
   client_ev->client = me;
   client_ev->selected_attraction_idx = selected_ride_idx;
+  
+  if (selected_ride_idx >= state->park->num_rides) {
+    struct event *reach_show_event = createEvent(sim->clock, reach_show, NULL, client_ev);
+    add_event_to_simulation(sim, reach_show_event, 0);
+    return;
+  }
 
   // NOTE: check for patience sigma
   double patience = GetRandomFromDistributionType(0, NORMAL_DISTRIB, me->patience_mu, me->patience_mu * 0.1);
 
+  patience = patience < 0 ? 0 : patience ;
+
   struct event *lose_patience = createEvent(sim->clock + patience, patience_lost, NULL, client_ev);
   client_ev->event = lose_patience;
-  add_event_to_simulation(sim, lose_patience, 1);
+  add_event_to_simulation(sim, lose_patience, 0);
+
   if (me->type == VIP) {
     generic_enqueue_element(state->rides[selected_ride_idx].vip_queue, client_ev);
   } else {
     generic_enqueue_element(state->rides[selected_ride_idx].normal_queue, client_ev);
-  }
-
-  if (selected_ride_idx >= state->park->num_rides) {
-    struct event *reach_show_event = createEvent(sim->clock, reach_show, NULL, (void *)selected_ride_idx);
-    add_event_to_simulation(sim, reach_show_event, 1);
-    return;
   }
 
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
@@ -88,6 +93,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 
       struct event *activate_server = createEvent(sim->clock, ride_server_activate, NULL, (void *) rideMetadata);
       add_event_to_simulation(sim, activate_server, queue_index + i);
+      return ;
     }
   }
 }
@@ -101,10 +107,13 @@ void reach_park(struct simulation *sim, void *metadata) {
     exit(1);
   }
 
-  me->should_exit = 0;
   double patience_mu = GetRandomFromDistributionType(0, state->park->patience_distribution, state->park->patience_mu, state->park->patience_sigma);
   double p = GetRandomFromDistributionType(1, UNIFORM, 0, 1);
+  double exit_time = GetRandomFromDistributionType(0, EXPONENTIAL, 1/(state->park->park_exit_rate), 0);
 
+  patience_mu = patience_mu < 0 ? state->park->patience_mu - state->park->patience_sigma : patience_mu ;
+
+  me->exit_time = exit_time;
   me->patience_mu = patience_mu;
   if (p > state->park->vip_tickets_percent) {
     me->type = NORMAL;
@@ -128,21 +137,15 @@ void reach_park(struct simulation *sim, void *metadata) {
     exit(1);
   }
 
+  state->total_clients += 1;
+
   struct event *event = createEvent(sim->clock, choose_delay, NULL, me);
   add_event_to_simulation(sim, event, 0);
-
-  double exit_time = GetRandomFromDistributionType(0, EXPONENTIAL, state->park->park_exit_rate, 0);
-  struct event *exit_event = createEvent(sim->clock + exit_time, client_exit_trigger, NULL, me);
-  add_event_to_simulation(sim, event, 0);
-}
-
-void client_exit_trigger(struct simulation *sim, void *metadata) {
-  ((struct client *) metadata)->should_exit = 1 ;
 }
 
 void next_reach(struct simulation *sim, void *metadata) {
   struct sim_state*state = (struct sim_state*)sim->state;
-  double next = GetRandomFromDistributionType(0, EXPONENTIAL, state->park->park_arrival_rate, 0);
+  double next = GetRandomFromDistributionType(0, EXPONENTIAL, 1/(state->park->park_arrival_rate), 0);
   struct event* event = createEvent(sim->clock + next, reach_park, next_reach, NULL);
   add_event_to_simulation(sim, event, 0);
 }
@@ -150,11 +153,14 @@ void next_reach(struct simulation *sim, void *metadata) {
 void choose_delay(struct simulation* sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
   struct client *client = (struct client *) metadata ;
-  if(client->should_exit) {
+  double delay = GetRandomFromDistributionType(0, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
+  if(sim->clock + delay > client->exit_time) {
+    state->total_clients_exited += 1;
+    generic_remove_element(state->clients, client);
     free(client) ;
     return ;
   }
-  double delay = GetRandomFromDistributionType(0, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
+  
   struct event *event = createEvent(sim->clock + delay, choose_attraction, NULL, metadata);
   add_event_to_simulation(sim, event, 0);
 }

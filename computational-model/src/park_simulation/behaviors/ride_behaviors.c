@@ -17,17 +17,17 @@ void ride_server_activate(struct simulation *sim, void *metadata)
     service_time = GetRandomFromDistributionType(0, ride.distribution, ride.mu, ride.sigma);
   }
 
-  if(state->rides[ride_meta->ride_idx].vip_queue != NULL) {
+  if(state->rides[ride_meta->ride_idx].vip_queue->head != NULL) {
     struct client_event *value = (struct client_event *) generic_dequeue_element(state->rides[ride_meta->ride_idx].vip_queue);
-    me = value->client ;
-    event = value->event ;
     if (value == NULL) {
       perror("Error while dequeue-ing from vip_arrivals. Exiting...");
       exit(1);
     }
+    me = value->client ;
+    event = value->event ;
     free(value) ;
   }
-  else if (state->rides[ride_meta->ride_idx].normal_queue != NULL) {
+  else if (state->rides[ride_meta->ride_idx].normal_queue->head != NULL) {
     struct client_event *value = (struct client_event *) generic_dequeue_element(state->rides[ride_meta->ride_idx].normal_queue);
     if (value == NULL) {
       perror("Error while dequeue-ing from normal_arrivals. Exiting...");
