@@ -53,5 +53,9 @@ struct client *create_new_client(double clock, double end, struct sim_state* sta
       state->total_clients_vip += 1;
     }
   }
+
+  me->lost_patience_times = 0 ;
+  me->arrival_time = clock;
+
   return me;
 }

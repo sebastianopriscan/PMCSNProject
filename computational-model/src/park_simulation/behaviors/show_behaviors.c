@@ -5,11 +5,17 @@ void reach_show(struct simulation* sim, void *metadata) {
   printf("launched reach_show at %f\n", sim->clock) ;
   struct sim_state *state = (struct sim_state *) sim->state ;
   struct client_event *client_ev = (struct client_event *) metadata;
+
+  int show_index = client_ev->selected_attraction_idx - state->park->num_rides;
+  state->shows[show_index].total_clients += 1;
   
-  double show_end = state->park->shows[client_ev->selected_attraction_idx - state->park->num_rides].length;
+  double show_end = state->park->shows[show_index].length;
   double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, client_ev->client->patience_mu, client_ev->client->patience_mu*0.1);
   patience = patience < 0 ? 0 : patience ;
   double next = show_end < patience ? show_end : patience;
+  
+  state->shows[show_index].total_permanence += next;
+
   struct event *event = createEvent(sim->clock + next, choose_delay, NULL, client_ev->client);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
   free(client_ev);

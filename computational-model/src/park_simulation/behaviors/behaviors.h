@@ -19,6 +19,8 @@ struct client_event {
   struct client *client;
   struct event *event;
   int selected_attraction_idx;
+  // Statistics
+  double arrival_time; //At a specific attraction
 };
 
 struct ride_metadata {

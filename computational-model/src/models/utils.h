@@ -5,6 +5,10 @@
 #ifndef MODEL_UTILS_H
 #define MODEL_UTILS_H
 
+struct double_value {
+  double value;
+};
+
 extern struct sim_state;
 
 enum distribution_type {

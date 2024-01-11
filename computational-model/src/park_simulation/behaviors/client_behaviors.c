@@ -9,11 +9,16 @@ void patience_lost(struct simulation *sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
   struct client_event *client_event = (struct client_event *)metadata;
   struct client* client = client_event->client;
+  client->lost_patience_times += 1;
 
   if (client_event->client->type == VIP) {
     generic_remove_element(state->rides[client_event->selected_attraction_idx].vip_queue, client_event);
+    state->rides[client_event->selected_attraction_idx].total_lost_vip += 1;
+    state->rides[client_event->selected_attraction_idx].total_lost_vip_delay += (sim->clock - client_event->arrival_time);
   } else {
     generic_remove_element(state->rides[client_event->selected_attraction_idx].normal_queue, client_event);
+    state->rides[client_event->selected_attraction_idx].total_lost_normal += 1;
+    state->rides[client_event->selected_attraction_idx].total_lost_normal_delay += (sim->clock - client_event->arrival_time);
   }
   free(client_event);
   struct event *event = createEvent(sim->clock, choose_attraction, NULL, client);
@@ -52,6 +57,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   }
   client_ev->client = me;
   client_ev->selected_attraction_idx = selected_ride_idx;
+  client_ev->arrival_time = sim->clock ;
   
   if (selected_ride_idx >= state->park->num_rides) {
     struct event *reach_show_event = createEvent(sim->clock, reach_show, NULL, client_ev);
@@ -70,8 +76,10 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 
   if (me->type == VIP) {
     generic_enqueue_element(state->rides[selected_ride_idx].vip_queue, client_ev);
+    state->rides[selected_ride_idx].total_clients_vip += 1;
   } else {
     generic_enqueue_element(state->rides[selected_ride_idx].normal_queue, client_ev);
+    state->rides[selected_ride_idx].total_clients_normal += 1;
   }
 
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
@@ -92,6 +100,11 @@ void choose_attraction(struct simulation *sim, void *metadata) {
       rideMetadata->server_idx = i;
       rideMetadata->queue_index = queue_index;
 
+      if(state->rides[selected_ride_idx].first_arrival == 0.0)
+        state->rides[selected_ride_idx].first_arrival = sim->clock;
+
+      state->rides[selected_ride_idx].last_arrival = sim->clock;
+
       struct event *activate_server = createEvent(sim->clock, ride_server_activate, NULL, (void *) rideMetadata);
       add_event_to_simulation(sim, activate_server, queue_index + i);
       return ;
@@ -102,11 +115,29 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 void reach_park(struct simulation *sim, void *metadata) {
   printf("launched reach_park at %f\n", sim->clock);
   struct sim_state *state = (struct sim_state *)sim->state;
+  
   if (state->clients_in_park == state->park->number_of_clients) {
+
+    state->total_clients_arrived++ ; // Next arrival, client is added to the queue
+
+    struct double_value *dv ;
+    if((dv = malloc(sizeof(struct double_value))) == NULL) {
+      fprintf(stderr, "Error in allocating double value struct. Exiting...\n") ;
+      exit(1) ;
+    }
+    dv->value = sim->clock;
+    generic_enqueue_element(state->entrance_queue_arrival_times, dv);
     state->clients_in_queue += 1;
     return;
   }
-  state->clients_in_queue = state->clients_in_queue > 0 ? state->clients_in_queue - 1 : 0;
+  if (state->clients_in_queue > 0) {
+    struct double_value *dv = (struct double_value *) generic_dequeue_element(state->entrance_queue_arrival_times);
+    state->clients_in_queue -= 1;
+    state->total_entrance_queue_times_delay += (sim->clock - dv->value);
+    free(dv);
+  } else {
+    state->total_clients_arrived += 1; //Next arrival, empty queue (and park not full) found
+  }
   state->clients_in_park += 1;
   
   struct client *me = create_new_client(sim->clock, sim->simEnd, state);
@@ -116,8 +147,6 @@ void reach_park(struct simulation *sim, void *metadata) {
     fprintf(stderr, "Error enqueuing client\n");
     exit(1);
   }
-
-  state->total_clients += 1;
 
   struct event *event = createEvent(sim->clock, choose_delay, NULL, me);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
@@ -138,8 +167,8 @@ void choose_delay(struct simulation* sim, void *metadata) {
   double delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
   if(sim->clock + delay > client->exit_time) {
     state->total_clients_exited += 1;
-    generic_remove_element(state->clients, client);
-    free(client) ;
+    // generic_remove_element(state->clients, client);
+    // free(client) ;
     state->clients_in_park -= 1;
     if (state->clients_in_queue > 0) {
       struct event* reach_park_event = createEvent(sim->clock, reach_park, NULL, NULL);
