@@ -24,7 +24,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
 
   int selected_ride_idx = -1;
-  double p = GetRandomFromDistributionType(2, UNIFORM, 0, 1);
+  double p = GetRandomFromDistributionType(5, UNIFORM, 0, 1);
 
   if (p <= state->popularities[0])
     selected_ride_idx = 0;
@@ -59,7 +59,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   }
 
   // NOTE: check for patience sigma
-  double patience = GetRandomFromDistributionType(0, NORMAL_DISTRIB, me->patience_mu, me->patience_mu * 0.1);
+  double patience = GetRandomFromDistributionType(6, NORMAL_DISTRIB, me->patience_mu, me->patience_mu * 0.1);
 
   patience = patience < 0 ? 0 : patience ;
 
@@ -107,9 +107,9 @@ void reach_park(struct simulation *sim, void *metadata) {
     exit(1);
   }
 
-  double patience_mu = GetRandomFromDistributionType(0, state->park->patience_distribution, state->park->patience_mu, state->park->patience_sigma);
-  double p = GetRandomFromDistributionType(1, UNIFORM, 0, 1);
-  double exit_time = GetRandomFromDistributionType(0, EXPONENTIAL, 1/(state->park->park_exit_rate), 0);
+  double patience_mu = GetRandomFromDistributionType(1, state->park->patience_distribution, state->park->patience_mu, state->park->patience_sigma);
+  double p = GetRandomFromDistributionType(2, UNIFORM, 0, 1);
+  double exit_time = GetRandomFromDistributionType(3, EXPONENTIAL, 1/(state->park->park_exit_rate), 0);
 
   patience_mu = patience_mu < 0 ? state->park->patience_mu - state->park->patience_sigma : patience_mu ;
 
@@ -153,7 +153,7 @@ void next_reach(struct simulation *sim, void *metadata) {
 void choose_delay(struct simulation* sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
   struct client *client = (struct client *) metadata ;
-  double delay = GetRandomFromDistributionType(0, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
+  double delay = GetRandomFromDistributionType(4, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
   if(sim->clock + delay > client->exit_time) {
     state->total_clients_exited += 1;
     generic_remove_element(state->clients, client);

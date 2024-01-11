@@ -8,13 +8,14 @@ void ride_server_activate(struct simulation *sim, void *metadata)
   struct sim_state *state = (struct sim_state*) sim->state;
   struct client *me;
   struct event *event;
+  int stream = ride_meta->queue_index + 5; // + 2 is already present when calcudlating queue_index
 
   double service_time = 0.0;
   
   if (state->rides[ride_meta->ride_idx].normal_queue->head != NULL || state->rides[ride_meta->ride_idx].vip_queue != NULL) {
     
     struct ride ride = state->park->rides[ride_meta->ride_idx];
-    service_time = GetRandomFromDistributionType(0, ride.distribution, ride.mu, ride.sigma);
+    service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.sigma);
   }
 
   if(state->rides[ride_meta->ride_idx].vip_queue->head != NULL) {

@@ -45,3 +45,12 @@ int run_park_simulation(const char *path) {
 //Clienti             : 0
 //Show                : 1
 //Giostra i, server k : 2 + sum(j in 0..i-1){ride[j]*serverNum[j]} + k
+
+// Streams
+// 0: next arrival
+// 1: patience_mu
+// 2: client type
+// 3: exit time
+// 4: delay
+// 5: popularity
+// 6: patience
