@@ -4,6 +4,7 @@
 
 void ride_server_activate(struct simulation *sim, void *metadata)
 {
+  printf("launched ride_server_activate at %f\n", sim->clock);
   struct ride_metadata *ride_meta = (struct ride_metadata *)metadata;
   struct sim_state *state = (struct sim_state*) sim->state;
   struct client *me;
@@ -53,5 +54,5 @@ void ride_server_activate(struct simulation *sim, void *metadata)
   struct event* next_server_activate_event = createEvent(next, ride_server_activate, NULL, metadata);
   add_event_to_simulation(sim, next_server_activate_event, ride_meta->queue_index);
   struct event* choose_delay_event = createEvent(next, choose_delay, NULL, me);
-  add_event_to_simulation(sim, choose_delay_event, 0);
+  add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);
 }

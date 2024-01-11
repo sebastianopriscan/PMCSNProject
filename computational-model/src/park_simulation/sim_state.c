@@ -112,10 +112,12 @@ struct sim_state *create_sim_state(struct park *park) {
         free(retVal->shows);
         free(retVal->active_shows);
         free(retVal);
-        fprintf(stderr, "Error allocating active shows\n");
         return NULL ;
     }
     evaluate_attraction_probabilities(retVal);
+
+    retVal->clients_in_park = 0 ;
+    retVal->clients_in_queue = 0 ;
 
     return retVal;
 }

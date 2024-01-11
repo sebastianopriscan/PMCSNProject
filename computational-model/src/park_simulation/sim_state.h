@@ -2,7 +2,7 @@
 #define SIM_STATE_H
 
 #include "../models/model.h"
-#include <generic_queue.h>
+#include "generic_queue.h"
 
 struct ride_state {
   unsigned int stat_vip_clients;
@@ -52,6 +52,8 @@ struct sim_state {
   int num_active_shows;
   double *popularities;
   char *active_shows;
+  unsigned int clients_in_park;
+  unsigned int clients_in_queue;
 };
 
 struct sim_state *create_sim_state(struct park *park) ;

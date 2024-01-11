@@ -4,6 +4,17 @@
 #include "../../models/model.h"
 #include "../sim_state.h"
 
+#define CLIENT_QUEUE 0
+#define SHOW_QUEUE 1
+
+#define NEXT_ARRIVAL_STREAM 0
+#define PATIENCE_MU_STREAM 1
+#define CLIENT_TYPE_STREAM 2
+#define EXIT_TIME_STREAM 3
+#define DELAY_STREAM 4
+#define POPULARITY_STREAM 5
+#define PATIENCE_STREAM 6
+
 struct client_event {
   struct client *client;
   struct event *event;

@@ -5,6 +5,8 @@
 #ifndef MODEL_UTILS_H
 #define MODEL_UTILS_H
 
+extern struct sim_state;
+
 enum distribution_type {
   NORMAL_DISTRIB,
   UNIFORM,
@@ -12,5 +14,6 @@ enum distribution_type {
 };
 
 double GetRandomFromDistributionType(int stream, enum distribution_type type, double mu, double sigma);
+struct client *create_new_client(double clock, double end, struct sim_state* state);
 
 #endif

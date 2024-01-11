@@ -21,12 +21,12 @@ int run_park_simulation(const char *path) {
   struct simulation* sim = create_simulation(num_queues, park->simulation_time, sim_state);
 
   struct event *first_arrival = createEvent(0, reach_park, next_reach, NULL) ;
-  add_event_to_simulation(sim, first_arrival, 0);
+  add_event_to_simulation(sim, first_arrival, CLIENT_QUEUE);
   for (int i = 0; i < park->num_shows; i++){
     for(int j = 0 ; j < park->shows[i].num_starting_times; j++) {
 
         struct event *show_activate_event = createEvent(park->shows[i].starting_times[j], show_activate, NULL, (void *) i) ;
-        add_event_to_simulation(sim, show_activate_event, 1) ;
+        add_event_to_simulation(sim, show_activate_event, SHOW_QUEUE) ;
     }
   }
   run_simulation(sim);
