@@ -139,7 +139,8 @@ void delete_sim_state(struct sim_state *state) {
 void evaluate_attraction_probabilities(struct sim_state *state) {
   double sum_open_popularities = state->rides_popularity_total;
   for (int i = 0; i < state->park->num_shows; i++) {
-    if(state->active_shows[i] == 1) sum_open_popularities += state->park->shows[i].popularity;
+    if(state->active_shows[i] == 1) 
+        sum_open_popularities += state->park->shows[i].popularity;
   }
 
   double residual = (1 - sum_open_popularities) / sum_open_popularities;
@@ -150,6 +151,11 @@ void evaluate_attraction_probabilities(struct sim_state *state) {
         state->popularities[i] = state->popularities[i-1];
         continue;
     }
-    state->popularities[i] = state->popularities[i-1] + state->park->rides[i].popularity * (1 + residual);
+    double popularity = 0.0;
+    if (i < state->park->num_rides)
+        popularity = state->park->rides[i].popularity;
+    else
+        popularity = state->park->shows[i - state->park->num_rides].popularity;
+    state->popularities[i] = state->popularities[i-1] + popularity * (1 + residual);
   }
 }
