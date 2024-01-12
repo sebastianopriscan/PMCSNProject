@@ -4,9 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define client_log(log) (log & 0b0001) 
+
 void patience_lost(struct simulation *sim, void *metadata) {
-  // printf("launched patience_lost at %f\n", sim->clock);
   struct sim_state *state = (struct sim_state *)sim->state;
+
+  if(client_log(state->log))
+    printf("launched patience_lost at %f\n", sim->clock);
   struct client_event *client_event = (struct client_event *)metadata;
   struct client* client = client_event->client;
   client->lost_patience_times += 1;
@@ -15,19 +19,24 @@ void patience_lost(struct simulation *sim, void *metadata) {
     generic_remove_element(state->rides[client_event->selected_attraction_idx].vip_queue, client_event);
     state->rides[client_event->selected_attraction_idx].total_lost_vip += 1;
     state->rides[client_event->selected_attraction_idx].total_lost_vip_delay += (sim->clock - client_event->arrival_time);
+    state->rides[client_event->selected_attraction_idx].total_delay_vip += (sim->clock - client_event->arrival_time);
   } else {
     generic_remove_element(state->rides[client_event->selected_attraction_idx].normal_queue, client_event);
     state->rides[client_event->selected_attraction_idx].total_lost_normal += 1;
     state->rides[client_event->selected_attraction_idx].total_lost_normal_delay += (sim->clock - client_event->arrival_time);
+    state->rides[client_event->selected_attraction_idx].total_delay_normal += (sim->clock - client_event->arrival_time);
   }
   free(client_event);
   struct event *event = createEvent(sim->clock, choose_attraction, NULL, client);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
 }
 
-void choose_attraction(struct simulation *sim, void *metadata) {
-  // printf("launched choose_attraction at %f\n", sim->clock);
+void choose_attraction(struct simulation *sim, void *metadata) {  
+  
   struct sim_state *state = (struct sim_state *)sim->state;
+
+  if(client_log(state->log))
+    printf("launched choose_attraction at %f\n", sim->clock);
 
   int selected_ride_idx = -1;
   double p = GetRandomFromDistributionType(POPULARITY_STREAM, UNIFORM, 0, 1);
@@ -115,8 +124,9 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 }
 
 void reach_park(struct simulation *sim, void *metadata) {
-  // printf("launched reach_park at %f\n", sim->clock);
   struct sim_state *state = (struct sim_state *)sim->state;
+  if(client_log(state->log))
+    printf("launched reach_park at %f\n", sim->clock);
   
   if (state->clients_in_park == state->park->number_of_clients) {
 
@@ -155,16 +165,18 @@ void reach_park(struct simulation *sim, void *metadata) {
 }
 
 void next_reach(struct simulation *sim, void *metadata) {
-  // printf("launched next_reach at %f\n", sim->clock);
   struct sim_state*state = (struct sim_state*)sim->state;
+  if(client_log(state->log))
+    printf("launched next_reach at %f\n", sim->clock);
   double next = GetRandomFromDistributionType(NEXT_ARRIVAL_STREAM, EXPONENTIAL, 1/(state->park->park_arrival_rate), 0);
   struct event* event = createEvent(sim->clock + next, reach_park, next_reach, NULL);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
 }
 
 void choose_delay(struct simulation* sim, void *metadata) {
-  // printf("launched choose_delay at %f\n", sim->clock);
   struct sim_state *state = (struct sim_state *)sim->state;
+  if(client_log(state->log))
+    printf("launched choose_delay at %f\n", sim->clock);
   struct client *client = (struct client *) metadata ;
   double delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
   if(sim->clock + delay > client->exit_time) {

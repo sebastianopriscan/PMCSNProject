@@ -7,7 +7,7 @@
 #include "../models/model.h"
 #include "sim_state.h"
 
-struct sim_state *create_sim_state(struct park *park) {
+struct sim_state *create_sim_state(struct park *park, int log) {
     struct sim_state *retVal ;
     if((retVal = malloc(sizeof(struct sim_state))) == NULL) {
         fprintf(stderr, "Error allocating simulation state.\n") ;
@@ -170,6 +170,7 @@ struct sim_state *create_sim_state(struct park *park) {
     }
 
     retVal->total_clients_exited = 0;
+    retVal->log = log;
 
     return retVal;
 }

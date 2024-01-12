@@ -1,9 +1,12 @@
 #include "behaviors.h"
 #include <stdlib.h>
 
+#define show_log(log) (log & 0b0010) 
+
 void reach_show(struct simulation* sim, void *metadata) {
-  // printf("launched reach_show at %f\n", sim->clock) ;
   struct sim_state *state = (struct sim_state *) sim->state ;
+  if(show_log(state->log))
+    printf("launched reach_show at %f\n", sim->clock) ;
   struct client_event *client_ev = (struct client_event *) metadata;
 
   int show_index = client_ev->selected_attraction_idx - state->park->num_rides;

@@ -2,11 +2,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define ride_log(log) (log & 0b0100) 
+
 void ride_server_activate(struct simulation *sim, void *metadata)
 {
-  // printf("launched ride_server_activate at %f\n", sim->clock);
   struct ride_metadata *ride_meta = (struct ride_metadata *)metadata;
   struct sim_state *state = (struct sim_state*) sim->state;
+  if (ride_log(state->log))
+    printf("launched ride_server_activate at %f\n", sim->clock);
   struct client *me;
   struct event *event;
   int stream = ride_meta->queue_index + 5; // + 2 is already present when calculating queue_index
