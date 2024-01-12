@@ -25,6 +25,8 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/libs/json-c/CMakeLists.txt")
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
+add_definitions(-fPIC)
+
 add_subdirectory(libs/NextEventSimulationFramework)
 add_subdirectory(libs/json-c)
 add_subdirectory(lambda-evaluator)
