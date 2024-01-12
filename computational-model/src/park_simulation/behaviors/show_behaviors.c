@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 void reach_show(struct simulation* sim, void *metadata) {
-  printf("launched reach_show at %f\n", sim->clock) ;
+  // printf("launched reach_show at %f\n", sim->clock) ;
   struct sim_state *state = (struct sim_state *) sim->state ;
   struct client_event *client_ev = (struct client_event *) metadata;
 
@@ -11,7 +11,7 @@ void reach_show(struct simulation* sim, void *metadata) {
   
   double show_end = state->park->shows[show_index].length;
   double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, client_ev->client->patience_mu, client_ev->client->patience_mu*0.1);
-  patience = patience < 0 ? 0 : patience ;
+  patience = patience < 0 ? -patience : patience ;
   double next = show_end < patience ? show_end : patience;
   
   state->shows[show_index].total_permanence += next;
@@ -23,7 +23,7 @@ void reach_show(struct simulation* sim, void *metadata) {
 
 // NOTE: show_activate is scheduled at the start of the simulation
 void show_activate(struct simulation * sim, void *metadata) {
-  printf("launched show_activate at %f\n", sim->clock) ;
+  // printf("launched show_activate at %f\n", sim->clock) ;
   struct sim_state *state = (struct sim_state *)sim->state;
   int idx = (int) metadata;
   state->active_shows[idx] = 1;
@@ -34,7 +34,7 @@ void show_activate(struct simulation * sim, void *metadata) {
 }
 
 void show_deactivate(struct simulation *sim, void *metadata) {
-  printf("launched show_deactivate at %f\n", sim->clock) ;
+  // printf("launched show_deactivate at %f\n", sim->clock) ;
   struct sim_state *state = (struct sim_state *)sim->state;
   int idx = (int) metadata;
   state->active_shows[idx] = 0;

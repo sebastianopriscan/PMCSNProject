@@ -29,8 +29,9 @@ struct ride_state {
   double total_lost_normal_delay ;
   double total_lost_vip_delay ;
 
-  double total_service_time; // Global
-  double *servers_service_times; // Local server
+  double global_service_mean; // Global
+  double *servers_service_means; // Local server
+  int *servers_served_clients; // Local server
 
   double first_arrival;
   double last_arrival ;
@@ -40,7 +41,7 @@ struct show_state {
   int total_clients ;
   // unsigned int stat_clients;
   // unsigned int total_clients;
-  // double total_service_time;
+  // double global_service_mean;
   // double total_delay;
   double total_permanence ;
 };

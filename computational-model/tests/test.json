@@ -20,7 +20,7 @@
     "rides": [
       {
         "name": "Steamboat Willie",
-        "popularity": 0.3,
+        "popularity": 0.1,
         "server_num": 13,
         "mean_time": 10.0,
         "service_distribution": "normal",
@@ -38,7 +38,7 @@
       },
       {
         "name": "Steamboat Willie Revolutions",
-        "popularity": 0.1,
+        "popularity": 0.3,
         "server_num": 30,
         "mean_time": 30.0,
         "service_distribution": "normal",

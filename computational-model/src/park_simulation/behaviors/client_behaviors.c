@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 void patience_lost(struct simulation *sim, void *metadata) {
-  printf("launched patience_lost at %f\n", sim->clock);
+  // printf("launched patience_lost at %f\n", sim->clock);
   struct sim_state *state = (struct sim_state *)sim->state;
   struct client_event *client_event = (struct client_event *)metadata;
   struct client* client = client_event->client;
@@ -26,7 +26,7 @@ void patience_lost(struct simulation *sim, void *metadata) {
 }
 
 void choose_attraction(struct simulation *sim, void *metadata) {
-  printf("launched choose_attraction at %f\n", sim->clock);
+  // printf("launched choose_attraction at %f\n", sim->clock);
   struct sim_state *state = (struct sim_state *)sim->state;
 
   int selected_ride_idx = -1;
@@ -68,7 +68,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   // NOTE: check for patience sigma
   double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, me->patience_mu, me->patience_mu * 0.1);
 
-  patience = patience < 0 ? 0 : patience ;
+  patience = patience < 0 ? -patience : patience ;
 
   struct event *lose_patience = createEvent(sim->clock + patience, patience_lost, NULL, client_ev);
   client_ev->event = lose_patience;
@@ -82,11 +82,16 @@ void choose_attraction(struct simulation *sim, void *metadata) {
     state->rides[selected_ride_idx].total_clients_normal += 1;
   }
 
+  if(state->rides[selected_ride_idx].first_arrival == 0.0)
+    state->rides[selected_ride_idx].first_arrival = sim->clock;
+
+  state->rides[selected_ride_idx].last_arrival = sim->clock;
+
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
   {
     if (state->rides[selected_ride_idx].busy_servers[i] == 0) {
       
-      int queue_index = 2;
+      int queue_index = 2 + i;
       for (int j = 0; j < selected_ride_idx; j++) {
         queue_index += state->park->rides[j].server_num;
       }
@@ -100,20 +105,17 @@ void choose_attraction(struct simulation *sim, void *metadata) {
       rideMetadata->server_idx = i;
       rideMetadata->queue_index = queue_index;
 
-      if(state->rides[selected_ride_idx].first_arrival == 0.0)
-        state->rides[selected_ride_idx].first_arrival = sim->clock;
-
-      state->rides[selected_ride_idx].last_arrival = sim->clock;
+      state->rides[selected_ride_idx].busy_servers[i] = 1;
 
       struct event *activate_server = createEvent(sim->clock, ride_server_activate, NULL, (void *) rideMetadata);
-      add_event_to_simulation(sim, activate_server, queue_index + i);
+      add_event_to_simulation(sim, activate_server, queue_index);
       return ;
     }
   }
 }
 
 void reach_park(struct simulation *sim, void *metadata) {
-  printf("launched reach_park at %f\n", sim->clock);
+  // printf("launched reach_park at %f\n", sim->clock);
   struct sim_state *state = (struct sim_state *)sim->state;
   
   if (state->clients_in_park == state->park->number_of_clients) {
@@ -153,7 +155,7 @@ void reach_park(struct simulation *sim, void *metadata) {
 }
 
 void next_reach(struct simulation *sim, void *metadata) {
-  printf("launched next_reach at %f\n", sim->clock);
+  // printf("launched next_reach at %f\n", sim->clock);
   struct sim_state*state = (struct sim_state*)sim->state;
   double next = GetRandomFromDistributionType(NEXT_ARRIVAL_STREAM, EXPONENTIAL, 1/(state->park->park_arrival_rate), 0);
   struct event* event = createEvent(sim->clock + next, reach_park, next_reach, NULL);
@@ -161,7 +163,7 @@ void next_reach(struct simulation *sim, void *metadata) {
 }
 
 void choose_delay(struct simulation* sim, void *metadata) {
-  printf("launched choose_delay at %f\n", sim->clock);
+  // printf("launched choose_delay at %f\n", sim->clock);
   struct sim_state *state = (struct sim_state *)sim->state;
   struct client *client = (struct client *) metadata ;
   double delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);

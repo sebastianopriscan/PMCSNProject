@@ -4,7 +4,7 @@
 
 void ride_server_activate(struct simulation *sim, void *metadata)
 {
-  printf("launched ride_server_activate at %f\n", sim->clock);
+  // printf("launched ride_server_activate at %f\n", sim->clock);
   struct ride_metadata *ride_meta = (struct ride_metadata *)metadata;
   struct sim_state *state = (struct sim_state*) sim->state;
   struct client *me;
@@ -52,8 +52,9 @@ void ride_server_activate(struct simulation *sim, void *metadata)
   state->rides[ride_meta->ride_idx].busy_servers[ride_meta->server_idx] = 1;
 
   double next = sim->clock + service_time;
-  state->rides[ride_meta->ride_idx].total_service_time += service_time;
-  state->rides[ride_meta->ride_idx].servers_service_times[ride_meta->server_idx] += service_time;
+  state->rides[ride_meta->ride_idx].global_service_mean += service_time;
+  double old_sum = state->rides[ride_meta->ride_idx].servers_service_means[ride_meta->server_idx] * state->rides[ride_meta->ride_idx].servers_served_clients[ride_meta->server_idx];
+  state->rides[ride_meta->ride_idx].servers_service_means[ride_meta->server_idx] = (old_sum + service_time) / (++state->rides[ride_meta->ride_idx].servers_served_clients[ride_meta->server_idx]);
 
   struct event* next_server_activate_event = createEvent(next, ride_server_activate, NULL, metadata);
   add_event_to_simulation(sim, next_server_activate_event, ride_meta->queue_index);

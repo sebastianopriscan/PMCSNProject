@@ -60,7 +60,7 @@ int run_park_simulation(const char *path) {
     fprintf(stderr, "\t\tTotal Lost VIP: %d\n", ride.total_lost_vip);
     fprintf(stderr, "\t\tTotal Delay Normal: %f\n", ride.total_delay_normal);
     fprintf(stderr, "\t\tTotal Delay VIP: %f\n", ride.total_delay_vip);
-    fprintf(stderr, "\t\tTotal Service Time: %f\n", ride.total_service_time);
+    fprintf(stderr, "\t\tTotal Service Time: %f\n", ride.global_service_mean);
 
     fprintf(stderr, "\t\tMean Normal lost delay: %f\n", ride.total_lost_normal_delay / ride.total_lost_normal) ;
     fprintf(stderr, "\t\tMean VIP lost delay: %f\n", ride.total_lost_vip_delay / ride.total_lost_vip) ;
@@ -69,7 +69,7 @@ int run_park_simulation(const char *path) {
     fprintf(stderr, "\t\tLambda: %f\n", 1 / (ride.last_arrival - ride.first_arrival));
     
     for(int j = 0; j < sim_state->park->rides[i].server_num; j++) {
-      fprintf(stderr, "\t\tServer %d Service Time; %f\n", j, ride.servers_service_times[j]);
+      fprintf(stderr, "\t\tServer %d Mean Service Time (total clients served: %d); %f\n", j, ride.servers_served_clients[j], ride.servers_service_means[j]);
     }
   }
   delete_sim_state(sim->state);
