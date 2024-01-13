@@ -1,0 +1,227 @@
+{
+    "simulation_time" : 600.0,
+    "vip_tickets": 0.1,
+    "maintenance_cost_per_rides": 1,
+    "maintenance_cost_per_shows": 1,
+    "construction_cost_per_seat": 1,
+    "vip_ticket_price": 1,
+    "normal_ticket_price": 1,
+    "number_of_clients": 54000,
+    "delay_enabled": false,
+    "delay_distribution": "normal",
+    "delay_mu": 0.1,
+    "delay_sigma": 0.1,
+    "patience_enabled": false,
+    "patience_distribution": "normal",
+    "patience_mu": 0.1,
+    "patience_sigma": 0.1,
+    "max_group_size": 5,
+    "park_arrival_rate" : "from lambda",
+    "park_next_reschedule_rate" : 0.1,
+    "park_exit_rate": "from lambda",
+    "rides": [
+      {
+        "name": "The Royal Reception Hall",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 5.0,
+        "service_distribution": "exponential",
+        "mu": 5.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Toy Soldier Parachute Drop",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 2.0,
+        "service_distribution": "exponential",
+        "mu": 2.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Duffy And Friends Play House",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 10.0,
+        "service_distribution": "exponential",
+        "mu": 10.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "RC Racer",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 5.0,
+        "service_distribution": "exponential",
+        "mu": 5.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Iron Man Tech Showcase",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 10.0,
+        "service_distribution": "exponential",
+        "mu": 10.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Slinky Dog Spin",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 2.0,
+        "service_distribution": "exponential",
+        "mu": 2.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Big Grizzly Mountain Runaway Mine Cars",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 3.0,
+        "service_distribution": "exponential",
+        "mu": 3.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Dumbo The Flying Elephant",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 3.0,
+        "service_distribution": "exponential",
+        "mu": 3.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Jungle River Cruise",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 7.0,
+        "service_distribution": "normal",
+        "mu": 7.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "The Many Adventures of Winnie the Pooh",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 3.0,
+        "service_distribution": "normal",
+        "mu": 3.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Mystic Manor",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 7.0,
+        "service_distribution": "normal",
+        "mu": 7.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Hyperspace Mountain",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 3.0,
+        "service_distribution": "normal",
+        "mu": 3.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Iron Man Experience",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 5.0,
+        "service_distribution": "normal",
+        "mu": 5.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Orbitron",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 2.0,
+        "service_distribution": "normal",
+        "mu": 2.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Rafts To Tarzan's Tuse",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 4.0,
+        "service_distribution": "normal",
+        "mu": 4.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "It's a Small World",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 15.0,
+        "service_distribution": "normal",
+        "mu": 15.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Ant-Man and The Wasp",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 4.0,
+        "service_distribution": "normal",
+        "mu": 1.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Mad Hatter Tea Cups",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 2.0,
+        "service_distribution": "normal",
+        "mu": 2.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Main Street Vehicles",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 3.0,
+        "service_distribution": "normal",
+        "mu": 3.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Cinderella Carousen",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 3.0,
+        "service_distribution": "normal",
+        "mu": 3.0,
+        "sigma": 0.1
+      },
+      {
+        "name": "Hong Kong Disneyland Railroad - Main Street Station",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 20.0,
+        "service_distribution": "normal",
+        "mu": 20.0,
+        "sigma": 0.1
+      }
+    ],
+    "shows": [
+      {
+        "name": "Animation Academy",
+        "popularity": "from lambda",
+        "mean_time": 30.0,
+        "service_distribution": "exponential",
+        "mu": 0.1,
+        "sigma": 0.1,
+        "length": 30.0,
+        "starting_times": [
+          10, 40, 70, 100, 130, 160, 190, 220, 250, 280, 310, 340, 400, 430, 460, 490, 520
+        ]
+      }
+    ]
+}

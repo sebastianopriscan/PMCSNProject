@@ -19,6 +19,13 @@ add_test(NAME TestDeserializer
 add_executable(TestParkSimulation 
   test_simulation.c
 )
-target_link_libraries(TestParkSimulation PRIVATE computational-model)
+target_link_libraries(TestParkSimulation PRIVATE NextEventSimulationFramework computational-model)
 add_test(NAME TestParkSimulation 
       COMMAND TestParkSimulation)
+
+add_executable(TestValidationSimulation 
+  validation_test_simulation.c
+)
+target_link_libraries(TestValidationSimulation PRIVATE NextEventSimulationFramework computational-model)
+add_test(NAME TestValidationSimulation 
+      COMMAND TestValidationSimulation)
