@@ -7,6 +7,7 @@
     "vip_ticket_price": 1,
     "normal_ticket_price": 1,
     "number_of_clients": 1,
+    "delay_enabled": true,
     "delay_distribution": "normal",
     "delay_mu": 0.1,
     "delay_sigma": 0.1,

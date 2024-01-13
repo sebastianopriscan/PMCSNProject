@@ -33,6 +33,7 @@ struct park *deserialize(const char *file) {
     json_object *vip_ticket_price_json = json_object_object_get(root, "vip_ticket_price");
     json_object *normal_ticket_price_json = json_object_object_get(root, "normal_ticket_price");
     json_object *number_of_clients_json = json_object_object_get(root, "number_of_clients");
+    json_object *delay_enabled_json = json_object_object_get(root, "delay_enabled");
     json_object *delay_distribution_json = json_object_object_get(root, "delay_distribution");
     json_object *delay_mu_json = json_object_object_get(root, "delay_mu");
     json_object *delay_sigma_json = json_object_object_get(root, "delay_sigma");
@@ -53,6 +54,7 @@ struct park *deserialize(const char *file) {
     park->vip_ticket_price = json_object_get_int(vip_ticket_price_json);
     park->normal_ticket_price = json_object_get_int(normal_ticket_price_json);
     park->number_of_clients = json_object_get_int(number_of_clients_json);
+    park->delay_distribution = json_object_get_boolean(delay_enabled_json) ;
     char* delay_distribution = json_object_get_string(delay_distribution_json);
     if(strcmp(delay_distribution, "normal") == 0) {
       park->delay_distribution = NORMAL_DISTRIB;

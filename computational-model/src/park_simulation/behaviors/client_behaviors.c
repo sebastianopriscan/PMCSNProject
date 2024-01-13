@@ -181,7 +181,9 @@ void choose_delay(struct simulation* sim, void *metadata) {
   if(client_log(state->log))
     printf("launched choose_delay at %f\n", sim->clock);
   struct client *client = (struct client *) metadata ;
-  double delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
+  double delay = 0.0;
+  if(state->park->delay_enabled)
+    delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
   if(sim->clock + delay > client->exit_time) {
     state->total_clients_exited += 1;
     // generic_remove_element(state->clients, client);
