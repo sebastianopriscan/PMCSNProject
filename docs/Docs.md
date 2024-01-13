@@ -85,6 +85,35 @@ Patience: normal (TODO: choose parameters)
 
 Decision (switch from IDLE to IN_QUEUE): exponential (with low lambda)
 
+### Hong Kong Disneyland
+
+| Attraction Name    | Arrival    | Service Time Mean    | Service Time Variance | Type | No. of seats| Arrival Distribution | Service Distribution | 
+|---------------- | --------------- | --------------- | ----- | -- | -- | -- | -- |
+| The Royal Reception Hall | --    | 5 | 0.1*mean | <center> Ride | 100 | <center> Exponential | <center> Normal |
+| Toy Soldier Parachute Drop | -- | 2 | 0.1 * mean | <center> Ride | 36 | <center> Exponential | <center> Normal |
+| Duffy and Friends Play House | -- | 10 | 0.1 * mean | <center> Ride | 100 | <center> Exponential | <center> Normal |
+| RC Racer | -- | 6 | 0.1 * mean | <center> Ride | 20 | <center> Exponential | <center> Normal |
+| Iron Man Tech Showcase | -- | 10 | 0.1 * mean | <center> Ride | 100 | <center> Exponential | <center> Normal |
+| Slinky Dog Spin | -- | 2 | 0.1 * mean | <center> Ride | 144 | <center> Exponential | <center> Normal |
+| Big Grizzly Mountain Runaway Mine Cars | -- | 3 | 0.1 * mean | <center> Ride | 144 | <center> Exponential | <center> Normal |
+| Dumbo the Flying Elephant | --   | 3 | 0.1*mean | <center> Ride | 32 | <center> Exponential | <center> Normal |
+| Jungle River Cruise | -- | 7 | 0.1 * mean | <center> Ride | 126 | <center> Exponential | <center> Normal |
+| The Many Adventures of Winnie the Pooh | -- | 3 | 0.1 * mean | <center> Ride | 56 | <center> Exponential | <center> Normal |
+| Mystic Manor | -- | 7 | 0.1 * mean | <center> Ride | 222 | <center> Exponential | <center> Normal |
+| Animation Academy | -- | 30 | 0.1 * mean | <center> Show | -- | <center> Exponential | <center> Normal |
+| Mickey's PhilharMagic | -- | 12 | 0.1 * mean | <center> Ride | 440 | <center> Exponential | <center> Normal |
+| Hyperspace Mountain | -- | 3 | 0.1 * mean | <center> Ride | 576 | <center> Exponential | <center> Normal |
+| Iron Man Experience | -- | 5 | 0.1 * mean | <center> Ride | 45 | <center> Exponential | <center> Normal |
+| Orbitron | -- | 2 | 0.1 * mean | <center> Ride | 64 | <center> Exponential | <center> Normal |
+| Rafts to Tarzan's Treehouse | -- | 4 | 0.1 * mean | <center> Ride | 48 | <center> Exponential | <center> Normal |
+| It's a small world | --   | 15 | 0.1*mean | <center> Ride | 256 | <center> Exponential | <center> Normal |
+| Ant-Man and The Wasp: Nano Battle! | -- | 4 | 0.1 * mean | <center> Ride | 112 | <center> Exponential | <center> Normal |
+| Mad Hatter Tea Cups | -- | 2 | 0.1 * mean | <center> Ride | 72 | <center> Exponential | <center> Normal |
+| Main Street Vehicles | -- | 3 | 0.1 * mean | <center> Ride | 200 | <center> Exponential | <center> Normal |
+| Cinderella Carousel | -- | 3 | 0.1 * mean | <center> Ride | 52 | <center> Exponential | <center> Normal |
+| Hong Kong Disneyland Railroad - Main Street Station | -- | 20 | 0.1 * mean | <center> Ride | 500 | <center> Exponential | <center> Normal |
+
+### Old
 | Attraction Name    | Arrival    | Service Time Mean    | Service Time Variance | Type | No. of seats| Arrival Distribution | Service Distribution | 
 |---------------- | --------------- | --------------- | ----- | -- | -- | -- | -- |
 | Alice in Wonderland    | --    | <center>4 Min    | 0.1*mean | <center> Ride | 16 | <center> Exponential | <center> Normal |
