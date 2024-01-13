@@ -42,6 +42,10 @@ int main(void) {
     fprintf(stderr, "Patiance Distribution: expected %d Got: %d\n", NORMAL_DISTRIB, park->patience_distribution);
     return 1;
   }
+  if(park->patience_enabled != 1) {
+    fprintf(stderr, "Patience enabled: expected 1 Got: %d\n", park->patience_enabled);
+    return 1;
+  }
   if(park->patience_mu != 0.1) {
     fprintf(stderr, "Patience Mu: expected 0.1 Got: %f\n", park->patience_mu);
     return 1;

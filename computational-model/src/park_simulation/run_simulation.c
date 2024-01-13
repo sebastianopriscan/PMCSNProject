@@ -8,7 +8,7 @@
 
 #define stats_log(log) (log & 0b1000) 
 
-int run_park_simulation(const char *path, int log) {
+struct simulation* run_park_simulation(const char *path, int log) {
   struct park* park = deserialize(path);
   if (park == NULL) {
     return 1;
@@ -76,10 +76,8 @@ int run_park_simulation(const char *path, int log) {
       }
     }
   }
-  delete_sim_state(sim->state);
-  destroy_simulation(sim);
   
-  return 0;
+  return sim;
 }
 
 // per ride: n server

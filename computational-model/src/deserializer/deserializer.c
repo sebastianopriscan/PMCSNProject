@@ -36,6 +36,7 @@ struct park *deserialize(const char *file) {
     json_object *delay_distribution_json = json_object_object_get(root, "delay_distribution");
     json_object *delay_mu_json = json_object_object_get(root, "delay_mu");
     json_object *delay_sigma_json = json_object_object_get(root, "delay_sigma");
+    json_object *patience_enabled_json = json_object_object_get(root, "patience_enabled");
     json_object *patience_distribution_json = json_object_object_get(root, "patience_distribution");
     json_object *patience_mu_json = json_object_object_get(root, "patience_mu");
     json_object *patience_sigma_json = json_object_object_get(root, "patience_sigma");
@@ -66,6 +67,7 @@ struct park *deserialize(const char *file) {
     }
     park->delay_mu = json_object_get_double(delay_mu_json);
     park->delay_sigma = json_object_get_double(delay_sigma_json);
+    park->patience_enabled = json_object_get_boolean(patience_enabled_json) ;
     char* patience_distribution = json_object_get_string(patience_distribution_json);
     if(strcmp(patience_distribution, "normal") == 0) {
       park->patience_distribution = NORMAL_DISTRIB;

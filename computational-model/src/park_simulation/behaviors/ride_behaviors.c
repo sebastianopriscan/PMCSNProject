@@ -50,7 +50,8 @@ void ride_server_activate(struct simulation *sim, void *metadata)
     return ;
   }
 
-  delete_event_from_simulation(sim, CLIENT_QUEUE, event) ; //TODO: Check if client queue is too busy, and evaluate moving to dedicated queue
+  if (state->park->patience_enabled)
+    delete_event_from_simulation(sim, CLIENT_QUEUE, event) ; //TODO: Check if client queue is too busy, and evaluate moving to dedicated queue
 
   state->rides[ride_meta->ride_idx].busy_servers[ride_meta->server_idx] = 1;
 

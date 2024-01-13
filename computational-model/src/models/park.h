@@ -19,6 +19,7 @@ struct park {
     enum distribution_type delay_distribution;
     double delay_mu;
     double delay_sigma;
+    int patience_enabled;
     enum distribution_type patience_distribution;
     double patience_mu;
     double patience_sigma;

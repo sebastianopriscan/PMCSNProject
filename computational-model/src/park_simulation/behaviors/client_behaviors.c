@@ -67,6 +67,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   client_ev->client = me;
   client_ev->selected_attraction_idx = selected_ride_idx;
   client_ev->arrival_time = sim->clock ;
+  client_ev->event = NULL;
   
   if (selected_ride_idx >= state->park->num_rides) {
     struct event *reach_show_event = createEvent(sim->clock, reach_show, NULL, client_ev);
@@ -75,13 +76,15 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   }
 
   // NOTE: check for patience sigma
-  double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, me->patience_mu, me->patience_mu * 0.1);
+  if (state->park->patience_enabled) {
+    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, me->patience_mu, me->patience_mu * 0.1);
 
-  patience = patience < 0 ? -patience : patience ;
+    patience = patience < 0 ? -patience : patience ;
 
-  struct event *lose_patience = createEvent(sim->clock + patience, patience_lost, NULL, client_ev);
-  client_ev->event = lose_patience;
-  add_event_to_simulation(sim, lose_patience, CLIENT_QUEUE);
+    struct event *lose_patience = createEvent(sim->clock + patience, patience_lost, NULL, client_ev);
+    client_ev->event = lose_patience;
+    add_event_to_simulation(sim, lose_patience, CLIENT_QUEUE);
+  }
 
   if (me->type == VIP) {
     generic_enqueue_element(state->rides[selected_ride_idx].vip_queue, client_ev);
