@@ -106,6 +106,10 @@ int main(void) {
     fprintf(stderr, "Park ride sigma: expected 0.1. Got: %f\n", park->rides[0].sigma);
     return 1;
   }
+  if(park->rides[0].expected_wait != 0.1) {
+    fprintf(stderr, "Park ride expected_wait: expected 0.1. Got: %f\n", park->rides[0].expected_wait);
+    return 1;
+  }
   if(strcmp(park->shows[0].name, "Name") != 0) {
     fprintf(stderr, "Park show name: expected Name. Got: %s\n", park->shows[0].name);
     return 1;

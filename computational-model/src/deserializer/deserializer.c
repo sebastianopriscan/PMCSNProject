@@ -55,7 +55,7 @@ struct park *deserialize(const char *file) {
     park->normal_ticket_price = json_object_get_int(normal_ticket_price_json);
     park->number_of_clients = json_object_get_int(number_of_clients_json);
     park->delay_distribution = json_object_get_boolean(delay_enabled_json) ;
-    char* delay_distribution = json_object_get_string(delay_distribution_json);
+    const char* delay_distribution = json_object_get_string(delay_distribution_json);
     if(strcmp(delay_distribution, "normal") == 0) {
       park->delay_distribution = NORMAL_DISTRIB;
     } else if (strcmp(delay_distribution, "exponential") == 0) {
@@ -70,7 +70,7 @@ struct park *deserialize(const char *file) {
     park->delay_mu = json_object_get_double(delay_mu_json);
     park->delay_sigma = json_object_get_double(delay_sigma_json);
     park->patience_enabled = json_object_get_boolean(patience_enabled_json) ;
-    char* patience_distribution = json_object_get_string(patience_distribution_json);
+    const char* patience_distribution = json_object_get_string(patience_distribution_json);
     if(strcmp(patience_distribution, "normal") == 0) {
       park->patience_distribution = NORMAL_DISTRIB;
     } else if (strcmp(patience_distribution, "exponential") == 0) {
@@ -102,7 +102,7 @@ struct park *deserialize(const char *file) {
         curr_ride = json_object_array_get_idx(rides_json, i) ;
         json_object *ride_name = json_object_object_get(curr_ride, "name") ;
         
-        char *name = json_object_get_string(ride_name) ;
+        const char *name = json_object_get_string(ride_name) ;
         if(name == NULL) {
           json_object_put(root);
             fprintf(stderr, "String field name is  null\n") ;
@@ -125,20 +125,23 @@ struct park *deserialize(const char *file) {
         json_object *ride_server_num = json_object_object_get(curr_ride, "server_num") ;
         park_rides[i].server_num = json_object_get_int(ride_server_num) ;
 
-        json_object *json_show_popularity = json_object_object_get(curr_ride, "popularity");
-        park_rides[i].popularity = json_object_get_double(json_show_popularity);
+        json_object *json_ride_popularity = json_object_object_get(curr_ride, "popularity");
+        park_rides[i].popularity = json_object_get_double(json_ride_popularity);
 
-        json_object *json_show_mean_time = json_object_object_get(curr_ride, "mean_time");
-        park_rides[i].mean_time= json_object_get_double(json_show_mean_time);
+        json_object *json_ride_mean_time = json_object_object_get(curr_ride, "mean_time");
+        park_rides[i].mean_time= json_object_get_double(json_ride_mean_time);
         
-        json_object *json_show_mu = json_object_object_get(curr_ride, "mu");
-        park_rides[i].mu = json_object_get_double(json_show_mu);
+        json_object *json_ride_mu = json_object_object_get(curr_ride, "mu");
+        park_rides[i].mu = json_object_get_double(json_ride_mu);
         
-        json_object *json_show_sigma = json_object_object_get(curr_ride, "sigma");
-        park_rides[i].sigma = json_object_get_double(json_show_sigma);
+        json_object *json_ride_sigma = json_object_object_get(curr_ride, "sigma");
+        park_rides[i].sigma = json_object_get_double(json_ride_sigma);
+
+        json_object *json_ride_expected_wait = json_object_object_get(curr_ride, "expected_wait");
+        park_rides[i].expected_wait = json_object_get_double(json_ride_expected_wait);
         
         json_object *service_distribution_json = json_object_object_get(curr_ride, "service_distribution");
-        char* service_distribution = json_object_get_string(service_distribution_json);
+        const char* service_distribution = json_object_get_string(service_distribution_json);
         if(strcmp(service_distribution, "normal") == 0) {
           park_rides[i].distribution = NORMAL_DISTRIB;
         } else if (strcmp(service_distribution, "exponential") == 0) {
@@ -165,7 +168,7 @@ struct park *deserialize(const char *file) {
     for (int i = 0; i < shows_size; i++) {
         curr_show = json_object_array_get_idx(shows_json, i);
         json_object *show_name = json_object_object_get(curr_show, "name");
-        char *name = json_object_get_string(show_name);
+        const char *name = json_object_get_string(show_name);
         if (name == NULL) {
           json_object_put(root);
           fprintf(stderr, "String field name is null\n");
@@ -195,7 +198,7 @@ struct park *deserialize(const char *file) {
         park_shows[i].sigma = json_object_get_double(json_show_sigma);
         
         json_object *service_distribution_json = json_object_object_get(curr_show, "service_distribution");
-        char* service_distribution = json_object_get_string(service_distribution_json);
+        const char* service_distribution = json_object_get_string(service_distribution_json);
         if(strcmp(service_distribution, "normal") == 0) {
           park_shows[i].distribution = NORMAL_DISTRIB;
         } else if (strcmp(service_distribution, "exponential") == 0) {

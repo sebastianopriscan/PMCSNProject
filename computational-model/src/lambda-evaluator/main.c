@@ -4,63 +4,16 @@
 #include <simulation/simulation.h>
 #include <rngs.h>
 #include <rvgs.h>
+#include <rvms.h>
 #include <generic_queue.h>
+#include <math.h>
+#include "../deserializer/deserializer.h"
+#include "../models/model.h"
 
-struct double_value {
-  double value ;
-} ;
-
-char *rides[12] = {"Alice In Wonderland",
-                   "Casey Junior's Circus Tale",
-                   "Dumbo",
-                   "Small World",
-                   "King Arthur",
-                   "Mad tea party",
-                   "Matterhorn",
-                   "Mister toad",
-                   "Peter Pan",
-                   "Pinocchio",
-                   "Snow White",
-                   "Storybook" } ;
-
-double expected_waits[12] = {34.0,
-                            15.0,
-                            28.0,
-                            19.0,
-                            18.0,
-                            17.0,
-                            52.0,
-                            20.0,
-                            39.0,
-                            17.0,
-                            22.0,
-                            16.0} ;
-
-double mus[12] = {4.0,
-                  4.0,
-                  2.0,
-                  14.0,
-                  3.0,
-                  2.0,
-                  4.0,
-                  2.0,
-                  3.0,
-                  3.0,
-                  2.0,
-                  10.0} ;
-
-int ridesNum[12] = {16,
-                    20,
-                    16,
-                    16,
-                    68,
-                    18,
-                    120,
-                    32,
-                    18,
-                    24,
-                    16,
-                    14} ;
+struct return_value {
+  double lambda;
+  double wait_time;
+};
 
 struct simulation_state {
   double lmba ;
@@ -127,6 +80,8 @@ struct simulation_state *init_state(unsigned int servNum, double lmba, double mu
 
 void destroy_state(struct simulation_state *state)
 {
+  destroy_generic_queue_list(state->vip_arrivals);
+  destroy_generic_queue_list(state->normal_arrivals);
   free(state->servers_status) ;
   free(state) ;
 }
@@ -194,7 +149,7 @@ void arrivalPayload(struct simulation *sim, void *metadata) {
     value->value = sim->clock;
 
     double p = Uniform(0.0, 1.0);
-    if (p > 0.5) {
+    if (p <= 0.1) {
       state->vip_Clients += 1;
       if(generic_enqueue_element(state->vip_arrivals, value)) {
         perror("Error in enqueue-ing to vip_arrivals. Exiting...") ;
@@ -239,14 +194,17 @@ struct simulation *run_single_simulation(double lambda, double mu, int server_nu
     struct event *event = createEvent(0.0, next_arrival, NULL, NULL);
     add_event_to_simulation(sim, event, 0);
     run_simulation(sim);
-    destroy_state(state);
     return sim ;
 }
 
-double run_lambda_evaluator(double expected_wait, double threshold, double mu, int server_num) {
-  double lambda = 3.1;
+struct return_value* run_lambda_evaluator(double expected_wait, double threshold, double mu, int server_num) {
+  double lambda = 1.0;
   double checker = 0.0;
-  double result = 0.0;
+  double real_wait = 0.0;
+  double delta = 3.0 ;
+
+  double lambda_lower_bound = 0.0;
+  double lambda_upper_bound = 0.0;
 
   SelectStream(0);
   long seedLambda = 0;
@@ -255,64 +213,146 @@ double run_lambda_evaluator(double expected_wait, double threshold, double mu, i
   SelectStream(1);
   long seedMu = 0 ;
   GetSeed(&seedMu) ;
-  
+ 
+  double direction = 0 ;
+
+  //find upper and lower bounds for lambda
   do {
-    lambda += 0.005;
     struct simulation *sim = run_single_simulation(lambda, mu, server_num);
     struct simulation_state *state = (struct simulation_state*)(sim->state);
     double total_delay = state->total_delay_normal + state->total_delay_vip ;
-    result = total_delay / (state->total_clients_normal + state->total_clients_vip);
-    // if (result != 0.0)
-    //   fprintf(stderr, "\tLambda: %.4f, Wait: %.6f; %d\n", lambda, result, result < expected_wait);
-    checker = (result - expected_wait) > 0 ? result - expected_wait : expected_wait - result ;
+    real_wait = total_delay / (state->total_clients_normal + state->total_clients_vip);
+
+    if (direction == 0) {
+      if(real_wait > expected_wait) {
+        lambda_upper_bound = lambda ;
+        direction = -1.0 ;
+      }
+      else {
+        lambda_lower_bound = lambda ;
+        direction = 1.0 ;
+      }
+      lambda = lambda + direction*delta < 0 ? lambda + direction * delta / 2 : lambda + direction * delta ;
+      continue;
+    }
+
+    if(direction == -1.0 && real_wait < expected_wait) {
+      lambda_lower_bound = lambda;
+      break;
+    } else if (direction == 1.0 && real_wait > expected_wait) {
+      lambda_upper_bound = lambda;
+      break;
+    }
+
+    lambda = lambda + direction*delta < 0 ? lambda + direction * delta / 2 : lambda + direction * delta ;
+    destroy_state(state);
+    destroy_simulation(sim);
+  } while(1);
+
+  SelectStream(0);
+  PutSeed(seedLambda);
+  SelectStream(1);
+  PutSeed(seedMu);
+
+  //Newton-like approximation method
+  do {
+    lambda = (lambda_upper_bound + lambda_lower_bound) / 2.0;
+
+    struct simulation *sim = run_single_simulation(lambda, mu, server_num);
+    struct simulation_state *state = (struct simulation_state*)(sim->state);
+    double total_delay = state->total_delay_normal + state->total_delay_vip ;
+    real_wait = total_delay / (state->total_clients_normal + state->total_clients_vip);
+    if(lambda_upper_bound - lambda_lower_bound < threshold)
+      break;
+
+    if (real_wait > expected_wait) {
+      lambda_upper_bound = lambda;
+    } else {
+      lambda_lower_bound = lambda;
+    }
+
+    checker = (real_wait - expected_wait) > 0 ? real_wait - expected_wait : expected_wait - real_wait ;
+    destroy_state(state);
     destroy_simulation(sim);
     
-    if(checker > threshold && result < expected_wait) {
+    if(checker > threshold) {
       SelectStream(0);
       PutSeed(seedLambda);
       SelectStream(1);
       PutSeed(seedMu);
     }
-   } while (checker > threshold && result < expected_wait);
+  } while (checker > threshold);
 
-  //  SelectStream(0);
-  //  PutSeed(seedLambda);
-  //  SelectStream(1);
-  //  PutSeed(seedMu);
-   return lambda;
+  fprintf(stderr, "Lambda: %6.6f; Wait Time: %6.6f\n", lambda, real_wait);
+  printf("%6.6f\n", lambda);
+  
+  struct return_value *retVal ;
+  if((retVal = malloc(sizeof( struct return_value))) == NULL) {
+    exit(1) ;
+  }
+  retVal->lambda = lambda;
+  retVal->wait_time = real_wait;
+  return retVal;
 }
 
 int main(void) {
-  int numRuns = 400;
-  int i = 0;
-  // for(int i = 0; i < 12; i++)
-  // {
+  struct park *park = deserialize("");
+  if (park == NULL) {
+    fprintf(stderr, "Error loading json\n");
+    exit(1);
+  }
+  int numRuns = 1000;
+  for (int i = 0; i < park->num_rides; i++) {
     PlantSeeds(12345) ;
     double lambda = 0.0;
+    double lambda_diff = 0.0;
+    double lambda_mean = 0.0;
+    double lambda_sum = 0.0;
+    double wait_time = 0.0;
+    double wait_time_diff = 0.0;
+    double wait_time_mean = 0.0;
+    double wait_time_sum = 0.0;
     for(int q = 0 ; q < numRuns ; q++)
     {
-      double l = run_lambda_evaluator(expected_waits[i], 0.5, mus[i], 1);
-      fprintf(stderr, "\tRun %d; Lambda: %.6f\n", q, l);
-      lambda += l;
+      fprintf(stderr, "\tRun %d; ", q) ;
+      struct return_value *r = run_lambda_evaluator(park->rides[i].expected_wait, 0.001, park->rides[i].mu, park->rides[i].server_num);
+      lambda_diff = r->lambda - lambda_mean;
+      lambda_sum += lambda_diff * lambda_diff * ((q + 1) - 1.0) / (q + 1);
+      lambda_mean += lambda_diff / (q+1);
+      wait_time_diff = r->wait_time - wait_time_mean;
+      wait_time_sum += wait_time_diff * wait_time_diff * ((q + 1) - 1.0) / (q + 1);
+      wait_time_mean += wait_time_diff / (q+1);
+
+      free(r) ;
     }
 
-    lambda = lambda/numRuns ;
-     
-    fprintf(stderr, "%s : Lambda: %6.6f, Expected Time %6.6f\n", rides[i], lambda, expected_waits[i]);
-    printf("%.4f, %.4f\n", lambda, mus[i]);
-    struct simulation *sim = run_single_simulation(lambda, mus[i], 1) ;
-    struct simulation_state * state = (struct simulation_state *)sim->state;
+    double u = 1.0 - 0.5 * (1.0 - 0.95);
+    double t = idfStudent(numRuns - 1, u);
 
-    double wait_vip = state->total_delay_vip / state->total_clients_vip;
-    double wait_normal = state->total_delay_normal / state->total_clients_normal;
-    double wait = 0.5 * wait_vip + 0.5 * wait_normal;
+    lambda = lambda_mean;
+    double stdev_lambda = sqrt(lambda_sum / numRuns);
+    double w_lambda = t * stdev_lambda / sqrt(numRuns - 1);
+    double stdev_wait_time = sqrt(wait_time_sum / numRuns);
+    double w_wait_time = t * stdev_wait_time / sqrt(numRuns - 1);
+    
+    fprintf(stderr, "%s : Lambda: %6.6f, Expected Time %6.6f\n", park->rides[i].name, lambda, park->rides[i].expected_wait);
+    fprintf(stderr, "Lambda: Expected value is in the interval: %6.6f +/- %6.6f; stdev: %6.6f\n", lambda_mean, w_lambda, stdev_lambda);
+    fprintf(stderr, "Wait Time: Expected value is in the interval: %6.6f +/- %6.6f; stdev: %6.6f\n", wait_time_mean, w_wait_time, stdev_wait_time);
+
+    // struct simulation *sim = run_single_simulation(lambda, mus[i], 1) ;
+    // struct simulation_state * state = (struct simulation_state *)sim->state;
+
+    // double wait_vip = state->total_delay_vip / state->total_clients_vip;
+    // double wait_normal = state->total_delay_normal / state->total_clients_normal;
+    // double total_delay = state->total_delay_normal + state->total_delay_vip ;
+    // double wait = total_delay / (state->total_clients_normal + state->total_clients_vip);
     
     // double total_delay = state->total_delay_normal + state->total_delay_vip - total_arrival;
     // double wait = total_delay / (state->total_clients_normal + state->total_clients_vip);
-    fprintf(stderr, "\tAverage Queue Time (vip): %6.6f\n", wait_vip);
-    fprintf(stderr, "\tAverage Queue Time (normal): %6.6f\n", wait_normal);
-    fprintf(stderr, "\tAverage Queue Time: %6.6f\n", wait);
-    fprintf(stderr, "\tNumber of clients: %d\n", state->total_clients_normal + state->total_clients_vip);
-  // }
+    // fprintf(stderr, "\tAverage Queue Time (vip): %6.6f\n", wait_vip);
+    // fprintf(stderr, "\tAverage Queue Time (normal): %6.6f\n", wait_normal);
+    // fprintf(stderr, "\tAverage Queue Time: %6.6f\n", wait);
+    // fprintf(stderr, "\tNumber of clients: %d\n", state->total_clients_normal + state->total_clients_vip);
+  }
   return 0;
 }

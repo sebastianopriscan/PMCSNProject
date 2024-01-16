@@ -27,7 +27,8 @@
         "mean_time": 0.1,
         "service_distribution": "normal",
         "mu": 0.1,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait" : 34.0
       }
     ],
     "shows": [

@@ -29,5 +29,4 @@ add_definitions(-fPIC)
 
 add_subdirectory(libs/NextEventSimulationFramework)
 add_subdirectory(libs/json-c)
-add_subdirectory(lambda-evaluator)
 add_subdirectory(computational-model)

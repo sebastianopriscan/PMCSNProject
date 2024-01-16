@@ -17,6 +17,7 @@ struct ride {
   enum distribution_type distribution;
   double mu;
   double sigma;
+  double expected_wait;
 };
 
 #endif
