@@ -27,7 +27,8 @@
         "mean_time": 5.0,
         "service_distribution": "exponential",
         "mu": 5.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 44.0
       },
       {
         "name": "Toy Soldier Parachute Drop",
@@ -36,7 +37,8 @@
         "mean_time": 2.0,
         "service_distribution": "exponential",
         "mu": 2.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 40.0
       },
       {
         "name": "Duffy And Friends Play House",
@@ -45,7 +47,8 @@
         "mean_time": 10.0,
         "service_distribution": "exponential",
         "mu": 10.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 29.0
       },
       {
         "name": "RC Racer",
@@ -54,7 +57,8 @@
         "mean_time": 5.0,
         "service_distribution": "exponential",
         "mu": 5.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 37.0
       },
       {
         "name": "Iron Man Tech Showcase",
@@ -63,7 +67,8 @@
         "mean_time": 10.0,
         "service_distribution": "exponential",
         "mu": 10.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 49.0
       },
       {
         "name": "Slinky Dog Spin",
@@ -72,7 +77,8 @@
         "mean_time": 2.0,
         "service_distribution": "exponential",
         "mu": 2.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 32.0
       },
       {
         "name": "Big Grizzly Mountain Runaway Mine Cars",
@@ -81,7 +87,8 @@
         "mean_time": 3.0,
         "service_distribution": "exponential",
         "mu": 3.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 41.0
       },
       {
         "name": "Dumbo The Flying Elephant",
@@ -90,7 +97,8 @@
         "mean_time": 3.0,
         "service_distribution": "exponential",
         "mu": 3.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 32.0
       },
       {
         "name": "Jungle River Cruise",
@@ -99,7 +107,8 @@
         "mean_time": 7.0,
         "service_distribution": "normal",
         "mu": 7.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 18.0
       },
       {
         "name": "The Many Adventures of Winnie the Pooh",
@@ -108,7 +117,8 @@
         "mean_time": 3.0,
         "service_distribution": "normal",
         "mu": 3.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 28.0
       },
       {
         "name": "Mystic Manor",
@@ -117,7 +127,8 @@
         "mean_time": 7.0,
         "service_distribution": "normal",
         "mu": 7.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 30.0
       },
       {
         "name": "Hyperspace Mountain",
@@ -126,7 +137,8 @@
         "mean_time": 3.0,
         "service_distribution": "normal",
         "mu": 3.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 22.0
       },
       {
         "name": "Iron Man Experience",
@@ -135,7 +147,8 @@
         "mean_time": 5.0,
         "service_distribution": "normal",
         "mu": 5.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 11.0
       },
       {
         "name": "Orbitron",
@@ -144,16 +157,18 @@
         "mean_time": 2.0,
         "service_distribution": "normal",
         "mu": 2.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 20.0
       },
       {
-        "name": "Rafts To Tarzan's Tuse",
+        "name": "Rafts To Tarzan's Treehouse",
         "popularity": "from lambda",
         "server_num": 2,
         "mean_time": 4.0,
         "service_distribution": "normal",
         "mu": 4.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 12.0
       },
       {
         "name": "It's a Small World",
@@ -162,7 +177,8 @@
         "mean_time": 15.0,
         "service_distribution": "normal",
         "mu": 15.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 15.0
       },
       {
         "name": "Ant-Man and The Wasp",
@@ -171,7 +187,8 @@
         "mean_time": 4.0,
         "service_distribution": "normal",
         "mu": 1.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 14.0
       },
       {
         "name": "Mad Hatter Tea Cups",
@@ -180,16 +197,8 @@
         "mean_time": 2.0,
         "service_distribution": "normal",
         "mu": 2.0,
-        "sigma": 0.1
-      },
-      {
-        "name": "Main Street Vehicles",
-        "popularity": "from lambda",
-        "server_num": 2,
-        "mean_time": 3.0,
-        "service_distribution": "normal",
-        "mu": 3.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 18.0
       },
       {
         "name": "Cinderella Carousen",
@@ -198,16 +207,8 @@
         "mean_time": 3.0,
         "service_distribution": "normal",
         "mu": 3.0,
-        "sigma": 0.1
-      },
-      {
-        "name": "Hong Kong Disneyland Railroad - Main Street Station",
-        "popularity": "from lambda",
-        "server_num": 2,
-        "mean_time": 20.0,
-        "service_distribution": "normal",
-        "mu": 20.0,
-        "sigma": 0.1
+        "sigma": 0.1,
+        "expected_wait": 14.0
       }
     ],
     "shows": [
@@ -222,6 +223,28 @@
         "starting_times": [
           10, 40, 70, 100, 130, 160, 190, 220, 250, 280, 310, 340, 400, 430, 460, 490, 520
         ]
+      }
+    ],
+    "disabled_rides": [
+      {
+        "name": "Main Street Vehicles",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 3.0,
+        "service_distribution": "normal",
+        "mu": 3.0,
+        "sigma": 0.1,
+        "expected_wait": "no value"
+      },
+      {
+        "name": "Hong Kong Disneyland Railroad - Main Street Station",
+        "popularity": "from lambda",
+        "server_num": 2,
+        "mean_time": 20.0,
+        "service_distribution": "normal",
+        "mu": 20.0,
+        "sigma": 0.1,
+        "expected_wait": "no_value"
       }
     ]
 }
