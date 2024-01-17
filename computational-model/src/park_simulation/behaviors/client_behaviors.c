@@ -77,7 +77,8 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 
   // NOTE: check for patience sigma
   if (state->park->patience_enabled) {
-    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, me->patience_mu, me->patience_mu * 0.1);
+    double mean_time = state->park->rides[selected_ride_idx].mu;
+    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, mean_time, mean_time * me->client_percentage);
 
     patience = patience < 0 ? -patience : patience ;
 

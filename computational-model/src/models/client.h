@@ -12,7 +12,7 @@ enum client_privilege {
 
 struct client {
     enum client_privilege type ;
-    double patience_mu ;
+    double client_percentage ;
     double exit_time;
     
     // Statistics

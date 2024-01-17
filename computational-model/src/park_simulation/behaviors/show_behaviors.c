@@ -15,7 +15,7 @@ void reach_show(struct simulation* sim, void *metadata) {
   
   double next = state->park->shows[show_index].length;
   if (state->park->patience_enabled) {
-    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, client_ev->client->patience_mu, client_ev->client->patience_mu*0.1);
+    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, next, client_ev->client->client_percentage*next);
     patience = patience < 0 ? -patience : patience ;
     next = next < patience ? next : patience;
   }
