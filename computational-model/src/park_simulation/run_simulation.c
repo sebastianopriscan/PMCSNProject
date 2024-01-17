@@ -11,7 +11,7 @@
 struct simulation* run_park_simulation(const char *path, int log) {
   struct park* park = deserialize(path);
   if (park == NULL) {
-    return 1;
+    return NULL;
   }
   int num_queues = 2;
   for (int i = 0; i < park->num_rides; i++) {
@@ -69,7 +69,7 @@ struct simulation* run_park_simulation(const char *path, int log) {
       fprintf(stderr, "\t\tMean VIP lost delay: %f\n", ride.total_lost_vip_delay / ride.total_lost_vip) ;
       fprintf(stderr, "\t\tMean Normal delay: %f\n", ride.total_delay_normal / ride.total_clients_normal) ;
       fprintf(stderr, "\t\tMean VIP delay: %f\n", ride.total_delay_vip / ride.total_clients_vip) ;
-      fprintf(stderr, "\t\tLambda: %f\n", 1 / (ride.last_arrival - ride.first_arrival));
+      fprintf(stderr, "\t\tLambda: %f\n", (ride.total_clients_normal + ride.total_clients_vip) / (ride.last_arrival - ride.first_arrival));
       
       for(int j = 0; j < sim_state->park->rides[i].server_num; j++) {
         fprintf(stderr, "\t\tServer %d Mean Service Time (total clients served: %d); %f\n", j, ride.servers_served_clients[j], ride.servers_service_means[j]);
