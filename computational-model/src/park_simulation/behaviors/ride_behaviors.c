@@ -50,6 +50,12 @@ void ride_server_activate(struct simulation *sim, void *metadata)
     return ;
   }
 
+  state->rides[ride_meta->ride_idx].last_arrival = me->arrival_time;
+  if (me->type == VIP)
+    state->rides[ride_meta->ride_idx].total_clients_vip += 1;
+  else
+    state->rides[ride_meta->ride_idx].total_clients_normal += 1;
+
   if (state->park->patience_enabled)
     delete_event_from_simulation(sim, CLIENT_QUEUE, event) ; //TODO: Check if client queue is too busy, and evaluate moving to dedicated queue
 

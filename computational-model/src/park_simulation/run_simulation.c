@@ -13,6 +13,10 @@ struct simulation* run_park_simulation(const char *path, int log) {
   if (park == NULL) {
     return NULL;
   }
+  return run_park_simulation(park, log);
+}
+
+struct simulation* run_park_simulation_from_park(struct park *park, int log) {
   int num_queues = 2;
   for (int i = 0; i < park->num_rides; i++) {
     num_queues += park->rides[i].server_num;

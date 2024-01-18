@@ -87,18 +87,13 @@ void choose_attraction(struct simulation *sim, void *metadata) {
     add_event_to_simulation(sim, lose_patience, CLIENT_QUEUE);
   }
 
-  if (me->type == VIP) {
+  if (me->type == VIP)
     generic_enqueue_element(state->rides[selected_ride_idx].vip_queue, client_ev);
-    state->rides[selected_ride_idx].total_clients_vip += 1;
-  } else {
+   else 
     generic_enqueue_element(state->rides[selected_ride_idx].normal_queue, client_ev);
-    state->rides[selected_ride_idx].total_clients_normal += 1;
-  }
 
   if(state->rides[selected_ride_idx].first_arrival == 0.0)
     state->rides[selected_ride_idx].first_arrival = sim->clock;
-
-  state->rides[selected_ride_idx].last_arrival = sim->clock;
 
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
   {
