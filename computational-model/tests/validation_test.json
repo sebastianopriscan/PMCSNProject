@@ -1,5 +1,5 @@
 {
-    "simulation_time" : 1000000.0,
+    "simulation_time" : 50000.0,
     "vip_tickets": 0.1,
     "maintenance_cost_per_rides": 1,
     "maintenance_cost_per_shows": 1,
@@ -16,7 +16,7 @@
     "patience_mu": 0.1,
     "patience_sigma": 0.1,
     "max_group_size": 5,
-    "park_arrival_rate" : 0.05,
+    "park_arrival_rate" : 0.5,
     "park_next_reschedule_rate" : 0.1,
     "park_exit_rate": 0.002778,
     "until_end": true,
@@ -24,7 +24,7 @@
       {
         "name": "The Royal Reception Hall",
         "popularity": 0.053,
-        "server_num": 2,
+        "server_num": 100,
         "mean_time": 5.0,
         "service_distribution": "exponential",
         "mu": 5.0,
@@ -34,7 +34,7 @@
       {
         "name": "Toy Soldier Parachute Drop",
         "popularity": 0.021,
-        "server_num": 2,
+        "server_num": 36,
         "mean_time": 2.0,
         "service_distribution": "exponential",
         "mu": 2.0,
@@ -44,7 +44,7 @@
       {
         "name": "Duffy And Friends Play House",
         "popularity": 0.102,
-        "server_num": 2,
+        "server_num": 100,
         "mean_time": 10.0,
         "service_distribution": "exponential",
         "mu": 10.0,
@@ -54,7 +54,7 @@
       {
         "name": "RC Racer",
         "popularity": 0.052,
-        "server_num": 2,
+        "server_num": 20,
         "mean_time": 5.0,
         "service_distribution": "exponential",
         "mu": 5.0,
@@ -64,7 +64,7 @@
       {
         "name": "Iron Man Tech Showcase",
         "popularity": 0.106,
-        "server_num": 2,
+        "server_num": 100,
         "mean_time": 10.0,
         "service_distribution": "exponential",
         "mu": 10.0,
@@ -74,7 +74,7 @@
       {
         "name": "Slinky Dog Spin",
         "popularity": 0.02,
-        "server_num": 2,
+        "server_num": 144,
         "mean_time": 2.0,
         "service_distribution": "exponential",
         "mu": 2.0,
@@ -84,7 +84,7 @@
       {
         "name": "Big Grizzly Mountain Runaway Mine Cars",
         "popularity": 0.031,
-        "server_num": 2,
+        "server_num": 144,
         "mean_time": 3.0,
         "service_distribution": "exponential",
         "mu": 3.0,
@@ -94,7 +94,7 @@
       {
         "name": "Dumbo The Flying Elephant",
         "popularity": 0.031,
-        "server_num": 2,
+        "server_num": 32,
         "mean_time": 3.0,
         "service_distribution": "exponential",
         "mu": 3.0,
@@ -104,7 +104,7 @@
       {
         "name": "Jungle River Cruise",
         "popularity": 0.069,
-        "server_num": 2,
+        "server_num": 126,
         "mean_time": 7.0,
         "service_distribution": "exponential",
         "mu": 7.0,
@@ -114,7 +114,7 @@
       {
         "name": "The Many Adventures of Winnie the Pooh",
         "popularity": 0.03,
-        "server_num": 2,
+        "server_num": 56,
         "mean_time": 3.0,
         "service_distribution": "exponential",
         "mu": 3.0,
@@ -124,7 +124,7 @@
       {
         "name": "Mystic Manor",
         "popularity": 0.071,
-        "server_num": 2,
+        "server_num": 222,
         "mean_time": 7.0,
         "service_distribution": "exponential",
         "mu": 7.0,
@@ -132,9 +132,19 @@
         "expected_wait": 30.0
       },
       {
+        "name": "Mickey's PhillarMagic",
+        "popularity": 0.0,
+        "server_num": 440,
+        "mean_time": 12.0,
+        "service_distribution": "exponential",
+        "mu": 12.0,
+        "sigma": 0.1,
+        "expected_wait": 12.0
+      },
+      {
         "name": "Hyperspace Mountain",
         "popularity": 0.03,
-        "server_num": 2,
+        "server_num": 576,
         "mean_time": 3.0,
         "service_distribution": "exponential",
         "mu": 3.0,
@@ -144,7 +154,7 @@
       {
         "name": "Iron Man Experience",
         "popularity": 0.048,
-        "server_num": 2,
+        "server_num": 45,
         "mean_time": 5.0,
         "service_distribution": "exponential",
         "mu": 5.0,
@@ -154,7 +164,7 @@
       {
         "name": "Orbitron",
         "popularity": 0.02,
-        "server_num": 2,
+        "server_num": 64,
         "mean_time": 2.0,
         "service_distribution": "exponential",
         "mu": 2.0,
@@ -164,7 +174,7 @@
       {
         "name": "Rafts To Tarzan's Treehouse",
         "popularity": 0.039,
-        "server_num": 2,
+        "server_num": 48,
         "mean_time": 4.0,
         "service_distribution": "exponential",
         "mu": 4.0,
@@ -174,7 +184,7 @@
       {
         "name": "It's a Small World",
         "popularity": 0.147,
-        "server_num": 2,
+        "server_num": 156,
         "mean_time": 9.0,
         "service_distribution": "exponential",
         "mu": 9.0,
@@ -184,7 +194,7 @@
       {
         "name": "Ant-Man and The Wasp",
         "popularity": 0.01,
-        "server_num": 2,
+        "server_num": 112,
         "mean_time": 4.0,
         "service_distribution": "exponential",
         "mu": 4.0,
@@ -194,7 +204,7 @@
       {
         "name": "Mad Hatter Tea Cups",
         "popularity": 0.02,
-        "server_num": 2,
+        "server_num": 72,
         "mean_time": 2.0,
         "service_distribution": "exponential",
         "mu": 2.0,
@@ -204,7 +214,7 @@
       {
         "name": "Cinderella Carousel",
         "popularity": 0.029,
-        "server_num": 2,
+        "server_num": 52,
         "mean_time": 3.0,
         "service_distribution": "exponential",
         "mu": 3.0,
