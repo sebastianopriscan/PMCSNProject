@@ -19,6 +19,7 @@
     "park_arrival_rate" : 0.1,
     "park_next_reschedule_rate" : 0.1,
     "park_exit_rate": 0.01,
+    "until_end": true,
     "rides": [
       {
         "name": "Name",

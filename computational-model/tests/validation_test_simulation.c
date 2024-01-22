@@ -39,21 +39,23 @@ int main(int argc, char **argv) {
     return 1;
   struct sim_state *state = (struct sim_state *)sim->state;
   
-  printf("Name, Normal Queue Time, VIP Queue Time, Lambda, Service Time 0, Service Time 1, VIP percent\n");
+  printf("Name, Normal Queue Time, VIP Queue Time, Lambda, Lambda Normal, Lambda VIP, Service Time 0, Service Time 1, VIP percent\n");
   for(int i = 0; i < state->park->num_rides; i++) {
     struct ride_state ride = state->rides[i];
-    printf("%s, %6.6f, %6.6f, %6.6f, ", 
+    printf("%s, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, ", 
           state->park->rides[i].name, 
           ride.total_delay_normal / ride.total_clients_normal, 
           ride.total_delay_vip / ride.total_clients_vip,
-          (ride.total_clients_normal + ride.total_clients_vip) / (ride.last_arrival - ride.first_arrival));
+          (ride.total_clients_normal + ride.total_clients_vip) / (ride.last_arrival - ride.first_arrival),
+          (ride.total_clients_normal) / (ride.last_arrival_normal - ride.first_arrival_normal),
+          (ride.total_clients_vip) / (ride.last_arrival_vip - ride.first_arrival_vip));
 
     for(int j = 0; j < state->park->rides[i].server_num; j++) {
       printf("%6.6f, ", ride.servers_service_means[j]);
     }
     printf("%6.6f\n", ((float)ride.total_clients_vip) / (ride.total_clients_normal + ride.total_clients_vip));
   }
-  // printf("%6.6f\n", ((float) state->total_clients_vip) / (state->total_clients_normal + state->total_clients_vip));
+  printf("%6.6f\n", ((float) state->total_clients_vip) / (state->total_clients_normal + state->total_clients_vip));
 
   // printf("Total Entrance Queue Times Delay: %f\n", state->total_entrance_queue_times_delay);
   // printf("Total Clients Arrived: %d\n", state->total_clients_arrived);

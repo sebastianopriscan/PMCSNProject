@@ -2,6 +2,7 @@
 #include "simulation/simulation.h"
 #include "../models/model.h"
 #include "../deserializer/deserializer.h"
+#include "run_simulation.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +14,7 @@ struct simulation* run_park_simulation(const char *path, int log) {
   if (park == NULL) {
     return NULL;
   }
-  return run_park_simulation(park, log);
+  return run_park_simulation_from_park(park, log);
 }
 
 struct simulation* run_park_simulation_from_park(struct park *park, int log) {
@@ -27,7 +28,14 @@ struct simulation* run_park_simulation_from_park(struct park *park, int log) {
   if (sim_state == NULL)
     exit(1);
 
-  struct simulation* sim = create_simulation(num_queues, park->simulation_time, sim_state);
+  struct simulation* sim ;
+
+  if(park->until_end) {
+    sim = create_simulation_until_end(num_queues, park->simulation_time, sim_state);
+  } else {
+    sim = create_simulation(num_queues, park->simulation_time, sim_state) ;
+  }
+   
   if(sim == NULL) {
     fprintf(stderr, "Error allocating memory for simulation\n");
     exit(1);
@@ -73,7 +81,8 @@ struct simulation* run_park_simulation_from_park(struct park *park, int log) {
       fprintf(stderr, "\t\tMean VIP lost delay: %f\n", ride.total_lost_vip_delay / ride.total_lost_vip) ;
       fprintf(stderr, "\t\tMean Normal delay: %f\n", ride.total_delay_normal / ride.total_clients_normal) ;
       fprintf(stderr, "\t\tMean VIP delay: %f\n", ride.total_delay_vip / ride.total_clients_vip) ;
-      fprintf(stderr, "\t\tLambda: %f\n", (ride.total_clients_normal + ride.total_clients_vip) / (ride.last_arrival - ride.first_arrival));
+      fprintf(stderr, "\t\tLambda Normal: %f\n", (ride.total_clients_normal) / (ride.last_arrival_normal - ride.first_arrival_normal));
+      fprintf(stderr, "\t\tLambda VIP: %f\n", (ride.total_clients_normal + ride.total_clients_vip) / (ride.last_arrival - ride.first_arrival));
       
       for(int j = 0; j < sim_state->park->rides[i].server_num; j++) {
         fprintf(stderr, "\t\tServer %d Mean Service Time (total clients served: %d); %f\n", j, ride.servers_served_clients[j], ride.servers_service_means[j]);

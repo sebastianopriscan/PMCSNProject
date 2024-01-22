@@ -22,6 +22,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
     service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.sigma);
   }
 
+  double arrival_time = 0.0;
   if(state->rides[ride_meta->ride_idx].vip_queue->head != NULL) {
     struct client_event *value = (struct client_event *) generic_dequeue_element(state->rides[ride_meta->ride_idx].vip_queue);
     if (value == NULL) {
@@ -30,6 +31,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
     }
     me = value->client ;
     event = value->event ;
+    arrival_time = value->arrival_time;
     state->rides[ride_meta->ride_idx].total_delay_vip += (sim->clock - value->arrival_time);
     free(value) ;
   }
@@ -41,6 +43,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
     }
     me = value->client;
     event = value->event;
+    arrival_time = value->arrival_time;
     state->rides[ride_meta->ride_idx].total_delay_normal += (sim->clock - value->arrival_time) ;
     free(value);
   }
@@ -50,11 +53,15 @@ void ride_server_activate(struct simulation *sim, void *metadata)
     return ;
   }
 
-  state->rides[ride_meta->ride_idx].last_arrival = me->arrival_time;
-  if (me->type == VIP)
+  state->rides[ride_meta->ride_idx].last_arrival = arrival_time;
+  if (me->type == VIP) {
     state->rides[ride_meta->ride_idx].total_clients_vip += 1;
-  else
+    state->rides[ride_meta->ride_idx].last_arrival_vip = arrival_time;
+  }
+  else {    
     state->rides[ride_meta->ride_idx].total_clients_normal += 1;
+    state->rides[ride_meta->ride_idx].last_arrival_normal = arrival_time;
+  }
 
   if (state->park->patience_enabled)
     delete_event_from_simulation(sim, CLIENT_QUEUE, event) ; //TODO: Check if client queue is too busy, and evaluate moving to dedicated queue
@@ -66,7 +73,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
   double old_sum = state->rides[ride_meta->ride_idx].servers_service_means[ride_meta->server_idx] * state->rides[ride_meta->ride_idx].servers_served_clients[ride_meta->server_idx];
   state->rides[ride_meta->ride_idx].servers_service_means[ride_meta->server_idx] = (old_sum + service_time) / (++state->rides[ride_meta->ride_idx].servers_served_clients[ride_meta->server_idx]);
 
-  struct event* next_server_activate_event = createEvent(next, ride_server_activate, NULL, metadata);
+  struct event* next_server_activate_event = createUndiscardableEvent(next, ride_server_activate, NULL, metadata);
   add_event_to_simulation(sim, next_server_activate_event, ride_meta->queue_index);
   struct event* choose_delay_event = createEvent(next, choose_delay, NULL, me);
   add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);

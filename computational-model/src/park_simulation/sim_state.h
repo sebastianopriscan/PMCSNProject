@@ -35,6 +35,10 @@ struct ride_state {
 
   double first_arrival;
   double last_arrival ;
+  double first_arrival_vip;
+  double last_arrival_vip;
+  double first_arrival_normal;
+  double last_arrival_normal;
 };
 
 struct show_state {

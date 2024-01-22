@@ -32,6 +32,7 @@ struct park {
     int num_shows;
     struct ride *rides;
     struct show *shows;
+    int until_end;
 } ;
 
 #endif

@@ -32,7 +32,6 @@ void patience_lost(struct simulation *sim, void *metadata) {
 }
 
 void choose_attraction(struct simulation *sim, void *metadata) {  
-  
   struct sim_state *state = (struct sim_state *)sim->state;
 
   if(client_log(state->log))
@@ -95,6 +94,12 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   if(state->rides[selected_ride_idx].first_arrival == 0.0)
     state->rides[selected_ride_idx].first_arrival = sim->clock;
 
+  if(state->rides[selected_ride_idx].first_arrival_normal == 0.0 && me->type == NORMAL)
+    state->rides[selected_ride_idx].first_arrival_normal = sim->clock;
+
+  if(state->rides[selected_ride_idx].first_arrival_vip == 0.0 && me->type == VIP)
+    state->rides[selected_ride_idx].first_arrival_vip = sim->clock;
+
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
   {
     if (state->rides[selected_ride_idx].busy_servers[i] == 0) {
@@ -115,7 +120,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 
       state->rides[selected_ride_idx].busy_servers[i] = 1;
 
-      struct event *activate_server = createEvent(sim->clock, ride_server_activate, NULL, (void *) rideMetadata);
+      struct event *activate_server = createUndiscardableEvent(sim->clock, ride_server_activate, NULL, (void *) rideMetadata);
       add_event_to_simulation(sim, activate_server, queue_index);
       return ;
     }

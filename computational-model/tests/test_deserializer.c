@@ -70,6 +70,10 @@ int main(void) {
     fprintf(stderr, "Park Exit Rate: expected 0.1 Got: %f\n", park->park_exit_rate);
     return 1;
   }
+  if(park->until_end != 1) {
+    fprintf(stderr, "Park Until End: expected true Got: %d\n", park->until_end);
+    return 1;
+  }
   if(park->num_rides != 1) {
     fprintf(stderr, "Num Rides: expected 1 Got: %d\n", park->num_rides);
     return 1;

@@ -36,6 +36,10 @@ struct sim_state *create_sim_state(struct park *park, int log) {
         rides[i].global_service_mean = 0.0;
         rides[i].first_arrival = 0.0 ;
         rides[i].last_arrival = 0.0;
+        rides[i].first_arrival_vip = 0.0 ;
+        rides[i].last_arrival_vip = 0.0;
+        rides[i].first_arrival_normal = 0.0 ;
+        rides[i].last_arrival_normal = 0.0;
         rides[i].servers_service_means = malloc(sizeof(double)*park->rides[i].server_num);
         rides[i].servers_served_clients = malloc(sizeof(int)*park->rides[i].server_num);
         rides[i].busy_servers = malloc(sizeof(char)*park->rides[i].server_num);
