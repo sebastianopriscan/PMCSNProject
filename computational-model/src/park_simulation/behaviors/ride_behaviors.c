@@ -75,6 +75,6 @@ void ride_server_activate(struct simulation *sim, void *metadata)
 
   struct event* next_server_activate_event = createUndiscardableEvent(next, ride_server_activate, NULL, metadata);
   add_event_to_simulation(sim, next_server_activate_event, ride_meta->queue_index);
-  struct event* choose_delay_event = createEvent(next, choose_delay, NULL, me);
+  struct event* choose_delay_event = createUndiscardableEvent(next, choose_delay, NULL, me);
   add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);
 }

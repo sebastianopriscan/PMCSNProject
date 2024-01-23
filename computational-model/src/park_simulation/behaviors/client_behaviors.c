@@ -27,7 +27,7 @@ void patience_lost(struct simulation *sim, void *metadata) {
     state->rides[client_event->selected_attraction_idx].total_delay_normal += (sim->clock - client_event->arrival_time);
   }
   free(client_event);
-  struct event *event = createEvent(sim->clock, choose_attraction, NULL, client);
+  struct event *event = createUndiscardableEvent(sim->clock, choose_attraction, NULL, client);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
 }
 
@@ -156,7 +156,7 @@ void reach_park(struct simulation *sim, void *metadata) {
   }
   state->clients_in_park += 1;
   
-  struct client *me = create_new_client(sim->clock, sim->simEnd, state);
+  struct client *me = create_new_client(sim->clock, sim->simEnd, state, sim->until_end);
 
   int ret = generic_enqueue_element(state->clients, me);
   if (ret != 0) {
@@ -164,7 +164,7 @@ void reach_park(struct simulation *sim, void *metadata) {
     exit(1);
   }
 
-  struct event *event = createEvent(sim->clock, choose_delay, NULL, me);
+  struct event *event = createUndiscardableEvent(sim->clock, choose_delay, NULL, me);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
 }
 
@@ -197,6 +197,6 @@ void choose_delay(struct simulation* sim, void *metadata) {
     return ;
   }
   
-  struct event *event = createEvent(sim->clock + delay, choose_attraction, NULL, metadata);
+  struct event *event = createUndiscardableEvent(sim->clock + delay, choose_attraction, NULL, metadata);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
 }

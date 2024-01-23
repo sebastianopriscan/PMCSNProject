@@ -23,7 +23,7 @@ double GetRandomFromDistributionType(int stream, enum distribution_type type, do
   }
 }
 
-struct client *create_new_client(double clock, double end, struct sim_state* state) {
+struct client *create_new_client(double clock, double end, struct sim_state* state, char until_end) {
     struct client *me = malloc(sizeof(struct client));
   if (me == NULL) {
     fprintf(stderr, "Error in allocating client size\n");
@@ -36,7 +36,11 @@ struct client *create_new_client(double clock, double end, struct sim_state* sta
 
   patience_mu = patience_mu < 0 ? state->park->patience_mu - state->park->patience_sigma : patience_mu ;
 
-  me->exit_time = clock + exit_time > end ? end : clock + exit_time;
+  if (until_end) {
+    me->exit_time = clock + exit_time;
+  } else {
+    me->exit_time = clock + exit_time > end ? end : clock + exit_time;
+  }
   me->client_percentage = patience_mu;
   if (p > state->park->vip_tickets_percent) {
     me->type = NORMAL;

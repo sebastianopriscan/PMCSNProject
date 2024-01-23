@@ -18,6 +18,6 @@ enum distribution_type {
 };
 
 double GetRandomFromDistributionType(int stream, enum distribution_type type, double mu, double sigma);
-struct client *create_new_client(double clock, double end, struct sim_state* state);
+struct client *create_new_client(double clock, double end, struct sim_state* state, char until_end);
 
 #endif

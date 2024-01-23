@@ -22,7 +22,7 @@ void reach_show(struct simulation* sim, void *metadata) {
   
   state->shows[show_index].total_permanence += next;
 
-  struct event *event = createEvent(sim->clock + next, choose_delay, NULL, client_ev->client);
+  struct event *event = createUndiscardableEvent(sim->clock + next, choose_delay, NULL, client_ev->client);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
   free(client_ev);
 }
