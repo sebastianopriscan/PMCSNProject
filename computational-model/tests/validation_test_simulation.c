@@ -33,9 +33,12 @@ int main(int argc, char **argv) {
       park->rides[i].popularity = 1.0 / (park->num_rides + park->num_shows) ;
     }
   } else if (!strcmp("--single", argv[1])) {
+    park->park_arrival_rate = 0.05;
+    park->simulation_time = 1000000.0;
     park->vip_tickets_percent = 0.0;
     for (int i = 0; i < park->num_rides; i++) {
       park->rides[i].server_num = 1;
+      park->rides[i].popularity = 1.0 / (park->num_rides + park->num_shows) ;
     }
   }
   struct simulation *sim = run_park_simulation_from_park(park, 0) ;
