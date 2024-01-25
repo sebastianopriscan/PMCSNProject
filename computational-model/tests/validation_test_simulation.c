@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 #include <simulation/simulation.h>
 #include "park_simulation/run_simulation.h"
@@ -19,7 +18,7 @@ int main(int argc, char **argv) {
     return 1;
   }
   if(!strcmp("--single-queue", argv[1])) {
-    park->park_arrival_rate = 1.0;
+    park->park_arrival_rate = 5.106;
     park->simulation_time = 50000.0;
     park->vip_tickets_percent = 0.0;
     for (int i = 0; i < park->num_rides; i++) {

@@ -28,11 +28,11 @@ def main() :
   tolerance = float(sys.argv[2])
   name, queue_time, lmba, node_mean_time, server_num = parse_csv(csv)
 
-  print('Name, Lambda, Service Time, Server Num, Empirical Queue Time, Theoretical Queue Time, , Check_result')
+  print('Name, Lambda, Service Time, Server Num, Empirical Queue Time, Theoretical Queue Time, Rho, , Check Result')
   for i in range(len(name)) :
     theoretical_queue_time = formula(lmba=lmba[i], node_mean_time=node_mean_time[i], server_num=server_num[i])
     check = abs(theoretical_queue_time - queue_time[i]) < tolerance
-    print(f'{name[i]}, {lmba[i]}, {node_mean_time[i]}, {server_num[i]}, {queue_time[i]}, {theoretical_queue_time}, , {check}')
+    print(f'{name[i]}, {lmba[i]}, {node_mean_time[i]}, {server_num[i]}, {queue_time[i]}, {theoretical_queue_time}, {lmba[i] * node_mean_time[i] / server_num[i]} , {check}')
   
 # E[T_q] = (P_q E[S]) / (1-rho)
 # E[S] = E[S_i] / m
