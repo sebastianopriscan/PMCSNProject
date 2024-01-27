@@ -96,9 +96,9 @@ void server_activate(struct simulation *sim, void *metadata)
 
   double service_time = 0.0;
   
-  if (state ->vip_Clients >0 || state->n_Clients > 0)
-    service_time = Exponential(1.0 / state->mu) ;
-  //  service_time = Normal(state->mu, state->sigma) ;
+  if (state->vip_Clients >0 || state->n_Clients > 0)
+    //service_time = Exponential(1.0 / state->mu) ;
+    service_time = Normal(state->mu, state->sigma) ;
 
   if(state->vip_Clients > 0) {
     state->vip_Clients -= 1;
@@ -307,7 +307,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  if((lambda_out = fopen(argv[2], "w")) == NULL) {
+  if((lambda_out = fopen(argv[2], "w+")) == NULL) {
     perror("Error opening lambda output file: ");
     exit(1);
   }
@@ -315,7 +315,7 @@ int main(int argc, char **argv) {
   printf("Name ; sample_lambda ; confidence_lambda ; sample_wait ; confidence_wait ; asked_wait ; lambda_sample_std ; wait_sample_std\n") ;
 
   fprintf(lambda_out, "Park name ; Lambda ; Wait\n") ;
-  int numRuns = 1000;
+  int numRuns = 10;
   for (int i = 0; i < park->num_rides; i++) {
     PlantSeeds(12345) ;
     double lambda = 0.0;
@@ -337,6 +337,7 @@ int main(int argc, char **argv) {
       wait_time_mean += wait_time_diff / (q+1);
 
       fprintf(lambda_out, "%s ; %6.6f; %6.6f\n", park->rides[i].name, r->lambda, r->wait_time);
+      fflush(lambda_out);
 
       free(r) ;
     }

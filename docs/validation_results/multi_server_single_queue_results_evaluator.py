@@ -47,14 +47,16 @@ def formula(lmba, node_mean_time, server_num) :
   tmp_log_2 = server_num * math.log(server_num * rho) - math.log(1 - rho)
   for i in range(1, server_num + 1):
     tmp_log_2 = tmp_log_2 - math.log(i)
-  tmp_log = 0
+  
+  sum = 0.0
   for i in range(0, server_num):
-    tmp_log = tmp_log + i * math.log(server_num * rho, 10)
+    tmp_log = i * math.log(server_num * rho)
     for j in range(1, i + 1):
-      tmp_log = tmp_log - math.log(j, 10)
+      tmp_log = tmp_log - math.log(j)
+    sum = sum + math.exp(tmp_log)
   p_0 = 0
   try:
-    p_0 = 1 / (math.pow(10, tmp_log) + math.exp(tmp_log_2))
+    p_0 = 1 / (math.exp(sum) + math.exp(tmp_log_2))
   except:
     p_0 = 0.001
 
