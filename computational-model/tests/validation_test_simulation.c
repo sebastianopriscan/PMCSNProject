@@ -18,23 +18,28 @@ int main(int argc, char **argv) {
     return 1;
   }
   if(!strcmp("--single-queue", argv[1])) {
-    park->park_arrival_rate = 5.106;
+    // park->park_arrival_rate = 5.106;
+    park->park_arrival_rate = 6.0;
     park->simulation_time = 50000.0;
     park->vip_tickets_percent = 0.0;
     for (int i = 0; i < park->num_rides; i++) {
       park->rides[i].popularity = 1.0 / (park->num_rides + park->num_shows) ;
     }
+    park->rides[3].server_num = 50;
   } else if (!strcmp("--single-server", argv[1])) {
-    park->park_arrival_rate = 0.05;
-    park->simulation_time = 10000000.0;
+    park->park_arrival_rate = 0.0004;
+    park->simulation_time = 1000000.0;
+    park->until_end = 0;
     for (int i = 0; i < park->num_rides; i++) {
       park->rides[i].server_num = 1;
       park->rides[i].popularity = 1.0 / (park->num_rides + park->num_shows) ;
     }
   } else if (!strcmp("--single", argv[1])) {
-    park->park_arrival_rate = 0.05;
+    park->park_arrival_rate = 0.001;
     park->simulation_time = 1000000.0;
     park->vip_tickets_percent = 0.0;
+    park->exit_probability = 0.002778;
+    park->until_end = 0;
     for (int i = 0; i < park->num_rides; i++) {
       park->rides[i].server_num = 1;
       park->rides[i].popularity = 1.0 / (park->num_rides + park->num_shows) ;
@@ -62,6 +67,7 @@ int main(int argc, char **argv) {
     printf("%6.6f\n", ((float)ride.total_clients_vip) / (ride.total_clients_normal + ride.total_clients_vip));
   }
   // printf("%6.6f\n", ((float) state->total_clients_vip) / (state->total_clients_normal + state->total_clients_vip));
+  // printf("Mean Permanence: %6.6f\n", state->total_permanence / state->total_clients_exited);
 
   // printf("Total Entrance Queue Times Delay: %f\n", state->total_entrance_queue_times_delay);
   // printf("Total Clients Arrived: %d\n", state->total_clients_arrived);

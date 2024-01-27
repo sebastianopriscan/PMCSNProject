@@ -251,5 +251,15 @@ struct park *deserialize(const char *file) {
       return NULL;
     }
 
+    //Temporary
+
+    double sumServiceRates = 0.0 ;
+
+    for(int i = 0 ; i < park->num_rides ; i++) {
+      sumServiceRates += 1/ park->rides[i].mu;
+    } 
+
+    park->exit_probability = park->park_exit_rate / sumServiceRates;
+
     return park;
 }

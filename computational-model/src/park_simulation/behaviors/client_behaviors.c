@@ -185,8 +185,11 @@ void choose_delay(struct simulation* sim, void *metadata) {
   double delay = 0.0;
   if(state->park->delay_enabled)
     delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
-  if(sim->clock + delay > client->exit_time) {
+  //if(sim->clock + delay > client->exit_time) {
+  if(GetRandomFromDistributionType(POPULARITY_STREAM, UNIFORM, 0, 1) < state->park->exit_probability) {
     state->total_clients_exited += 1;
+    state->total_permanence += (sim->clock - client->arrival_time);
+    // fprintf(stderr, "A client stayed for %6.6f: clock: %6.6f, arrival: %6.6f\n", sim->clock - client->arrival_time, sim->clock, client->arrival_time) ;
     // generic_remove_element(state->clients, client);
     // free(client) ;
     state->clients_in_park -= 1;

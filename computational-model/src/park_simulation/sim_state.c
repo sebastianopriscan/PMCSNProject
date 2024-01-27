@@ -174,6 +174,7 @@ struct sim_state *create_sim_state(struct park *park, int log) {
     }
 
     retVal->total_clients_exited = 0;
+    retVal->total_permanence = 0.0;
     retVal->log = log;
 
     return retVal;

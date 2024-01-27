@@ -33,13 +33,15 @@ def main() :
     theoretical_queue_time = formula(lmba=lmba[i], node_mean_time=node_mean_time[i], server_num=server_num[i])
     check = abs(theoretical_queue_time - queue_time[i]) < tolerance
     print(f'{name[i]}, {lmba[i]}, {node_mean_time[i]}, {server_num[i]}, {queue_time[i]}, {theoretical_queue_time}, {lmba[i] * node_mean_time[i] / server_num[i]} , {check}')
-  
+ 
 # E[T_q] = (P_q E[S]) / (1-rho)
 # E[S] = E[S_i] / m
 # P_q = (((m rho)^m) / (m! (1-rho)))* p(0)
 # p(0) = [sum_i=0^{m-1} ((m rho)^i / i!) + ((m rho)^m) / (m! (1-rho))]^(-1)
 def formula(lmba, node_mean_time, server_num) :
   rho = lmba * node_mean_time / server_num
+  if rho > 1.0:
+    return 0
   e_s = node_mean_time / server_num
 
   tmp_log_2 = server_num * math.log(server_num * rho) - math.log(1 - rho)
@@ -54,7 +56,7 @@ def formula(lmba, node_mean_time, server_num) :
   try:
     p_0 = 1 / (math.pow(10, tmp_log) + math.exp(tmp_log_2))
   except:
-    pass
+    p_0 = 0.001
 
   # p_0 = pow(server_num * rho, server_num) / (math.factorial(server_num)*(1 - rho))
   # for i in range(0, server_num) :

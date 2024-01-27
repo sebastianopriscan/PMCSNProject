@@ -86,6 +86,7 @@ struct sim_state {
   int total_clients_arrived ;
 
   int total_clients_exited;
+  double total_permanence;
   int log; // 0b0001: client; 0b0010: show; 0b0100: ride; 0b1000: stats
 };
 
