@@ -12,8 +12,8 @@ add_executable(production_runs
 
 target_link_libraries(production_runs PRIVATE computational-model)
 target_link_libraries(production_runs PRIVATE lambda_evaluator)
-target_link_libraries(production_runs PRIVATE pthread)
 target_link_libraries(production_runs PRIVATE NextEventSimulationFramework)
+target_link_libraries(production_runs PRIVATE m)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   enable_testing()

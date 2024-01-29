@@ -27,11 +27,11 @@ void patience_lost(struct simulation *sim, void *metadata) {
     state->rides[client_event->selected_attraction_idx].total_delay_normal += (sim->clock - client_event->arrival_time);
   }
   free(client_event);
-  struct event *event = createUndiscardableEvent(sim->clock, choose_attraction, NULL, client);
+  struct event *event = createUndiscardableEvent(sim->clock, choose_delay, NULL, client);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
 }
 
-void choose_attraction(struct simulation *sim, void *metadata) {  
+void choose_attraction(struct simulation *sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
 
   if(client_log(state->log))
