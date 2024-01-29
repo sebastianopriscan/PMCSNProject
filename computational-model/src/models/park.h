@@ -34,6 +34,9 @@ struct park {
     struct show *shows;
     int until_end;
 
+    int num_disabled_rides;
+    struct ride *disabled_rides;
+
     //Temporary
     double exit_probability ;
 } ;
