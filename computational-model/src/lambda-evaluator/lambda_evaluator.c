@@ -67,6 +67,16 @@ struct simulation_state *init_state(unsigned int servNum, int batch_size, double
 
 void destroy_state(struct simulation_state *state)
 {
+  void *toFree ;
+  do {
+    toFree = generic_dequeue_element(state->vip_arrivals) ;
+    free(toFree) ;
+  } while(toFree != NULL) ;
+  do {
+    toFree = generic_dequeue_element(state->normal_arrivals) ;
+    free(toFree) ;
+  } while(toFree != NULL) ;
+
   destroy_generic_queue_list(state->vip_arrivals);
   destroy_generic_queue_list(state->normal_arrivals);
   free(state) ;
@@ -112,7 +122,11 @@ void server_activate(struct simulation *sim, void *metadata)
   double next = sim->clock + service_time;
 
   struct event* event = createEvent(next, server_activate, NULL, metadata);
-  add_event_to_simulation(sim, event, i+1);
+  int code = add_event_to_simulation(sim, event, i+1);
+  if(code == 1) {
+    free(event) ;
+
+  }
 }
 
 void arrivalPayload(struct simulation *sim, void *metadata) {
@@ -155,7 +169,10 @@ void next_arrival(struct simulation *sim, void *metadata) {
 
     struct event *event1 = createEvent(time, arrivalPayload, next_arrival, NULL) ;
 
-    add_event_to_simulation(sim, event1, 0);
+    int code = add_event_to_simulation(sim, event1, 0);
+    if(code == 1) {
+      free(event1) ;
+    }
 }
 
 struct simulation *run_single_simulation(double lambda, double mu, int server_num, int batch_size) {
@@ -207,14 +224,20 @@ struct return_value* run_lambda_evaluator(double expected_wait, double threshold
         direction = 1.0 ;
       }
       lambda = lambda + direction*delta < 0 ? lambda + direction * delta / 2 : lambda + direction * delta ;
+      destroy_state(state);
+      destroy_simulation(sim);
       continue;
     }
 
     if(direction == -1.0 && real_wait < expected_wait) {
       lambda_lower_bound = lambda;
+      destroy_state(state);
+      destroy_simulation(sim);
       break;
     } else if (direction == 1.0 && real_wait > expected_wait) {
       lambda_upper_bound = lambda;
+      destroy_state(state);
+      destroy_simulation(sim);
       break;
     }
 
@@ -236,9 +259,12 @@ struct return_value* run_lambda_evaluator(double expected_wait, double threshold
     struct simulation_state *state = (struct simulation_state*)(sim->state);
     double total_delay = state->total_delay_normal + state->total_delay_vip ;
     real_wait = total_delay / (state->total_clients_normal + state->total_clients_vip);
-    if(lambda_upper_bound - lambda_lower_bound < threshold)
+    if(lambda_upper_bound - lambda_lower_bound < threshold) {
+      destroy_state(state);
+      destroy_simulation(sim);
       break;
-
+    }
+      
     if (real_wait > expected_wait) {
       lambda_upper_bound = lambda;
     } else {
