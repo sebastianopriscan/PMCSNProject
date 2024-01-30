@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "lambda_evaluator.h"
+#include "../deserializer/deserializer.h"
 #include "../models/model.h"
 #include "rvms.h"
+#include "rngs.h"
+#include <math.h>
 
 FILE *lambda_out ;
 
@@ -39,7 +43,7 @@ int main(int argc, char **argv) {
     double wait_time_sum = 0.0;
     for(int q = 0 ; q < numRuns ; q++)
     {
-      struct return_value *r = run_lambda_evaluator(park->rides[i].expected_wait, 0.001, park->rides[i].mu, park->rides[i].server_num);
+      struct return_value *r = run_lambda_evaluator(park->rides[i].expected_wait, 0.001, park->rides[i].mu, park->rides[i].server_num, park->rides[i].batch_size);
       lambda_diff = r->lambda - lambda_mean;
       lambda_sum += lambda_diff * lambda_diff * ((q + 1) - 1.0) / (q + 1);
       lambda_mean += lambda_diff / (q+1);
@@ -61,28 +65,9 @@ int main(int argc, char **argv) {
     double w_lambda = t * stdev_lambda / sqrt(numRuns - 1);
     double stdev_wait_time = sqrt(wait_time_sum / numRuns);
     double w_wait_time = t * stdev_wait_time / sqrt(numRuns - 1);
-    
-    // fprintf(stderr, "%s : Lambda: %6.6f, Expected Time %6.6f\n", park->rides[i].name, lambda, park->rides[i].expected_wait);
-    // fprintf(stderr, "Lambda: Expected value is in the interval: %6.6f +/- %6.6f; stdev: %6.6f\n", lambda_mean, w_lambda, stdev_lambda);
-    // fprintf(stderr, "Wait Time: Expected value is in the interval: %6.6f +/- %6.6f; stdev: %6.6f\n", wait_time_mean, w_wait_time, stdev_wait_time);
 
     printf("%s ; %6.6f ; %6.6f ; %6.6f ; %6.6f ; %6.6f ; %6.6f ; %6.6f\n",
      park->rides[i].name, lambda, w_lambda, wait_time_mean, w_wait_time, park->rides[i].expected_wait, stdev_lambda, stdev_wait_time) ;
-
-    // struct simulation *sim = run_single_simulation(lambda, mus[i], 1) ;
-    // struct simulation_state * state = (struct simulation_state *)sim->state;
-
-    // double wait_vip = state->total_delay_vip / state->total_clients_vip;
-    // double wait_normal = state->total_delay_normal / state->total_clients_normal;
-    // double total_delay = state->total_delay_normal + state->total_delay_vip ;
-    // double wait = total_delay / (state->total_clients_normal + state->total_clients_vip);
-    
-    // double total_delay = state->total_delay_normal + state->total_delay_vip - total_arrival;
-    // double wait = total_delay / (state->total_clients_normal + state->total_clients_vip);
-    // fprintf(stderr, "\tAverage Queue Time (vip): %6.6f\n", wait_vip);
-    // fprintf(stderr, "\tAverage Queue Time (normal): %6.6f\n", wait_normal);
-    // fprintf(stderr, "\tAverage Queue Time: %6.6f\n", wait);
-    // fprintf(stderr, "\tNumber of clients: %d\n", state->total_clients_normal + state->total_clients_vip);
   }
   return 0;
 }

@@ -56,7 +56,6 @@ struct sim_state {
   struct generic_queue_list *clients;
 
   // used when calculating tickets
-  int available_vip_tickets ;
   int total_clients_normal; 
   int total_clients_vip;
 

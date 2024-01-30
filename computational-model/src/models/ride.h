@@ -13,6 +13,7 @@ struct ride {
   const char *name;
   double popularity;
   int server_num;
+  int batch_size;
   double mean_time;
   enum distribution_type distribution;
   double mu;

@@ -39,6 +39,9 @@ struct ride *get_rides(json_object* array) {
         json_object *ride_server_num = json_object_object_get(curr_ride, "server_num") ;
         park_rides[i].server_num = json_object_get_int(ride_server_num) ;
 
+        json_object *ride_batch_size = json_object_object_get(curr_ride, "batch_size") ;
+        park_rides[i].batch_size = json_object_get_int(ride_batch_size) ;
+
         json_object *json_ride_popularity = json_object_object_get(curr_ride, "popularity");
         park_rides[i].popularity = json_object_get_double(json_ride_popularity);
 
@@ -89,7 +92,8 @@ struct park *deserialize(const char *file) {
     json_object *shows_json = json_object_object_get(root, "shows");
     json_object *disabled_rides_json = json_object_object_get(root, "disabled_rides") ;
     json_object *simulation_time_json = json_object_object_get(root, "simulation_time");
-    json_object *vip_tickets_json = json_object_object_get(root, "vip_tickets");
+    json_object *vip_percent_json = json_object_object_get(root, "vip_percent");
+    json_object *max_vip_tickets_json = json_object_object_get(root, "max_vip_tickets") ;
     json_object *maintenance_cost_per_rides_json = json_object_object_get(root, "maintenance_cost_per_rides");
     json_object *maintenance_cost_per_shows_json = json_object_object_get(root, "maintenance_cost_per_shows");
     json_object *construction_cost_per_seat_json = json_object_object_get(root, "construction_cost_per_seat");
@@ -111,7 +115,8 @@ struct park *deserialize(const char *file) {
     json_object *until_end_json = json_object_object_get(root, "until_end");
 
     park->simulation_time = json_object_get_double(simulation_time_json);
-    park->vip_tickets_percent = json_object_get_double(vip_tickets_json);
+    park->vip_tickets_percent = json_object_get_double(vip_percent_json);
+    park->max_vip_tickets = json_object_get_int(max_vip_tickets_json) ;
     park->maintainance_cost_per_rides = json_object_get_int(maintenance_cost_per_rides_json);
     park->maintainance_cost_per_shows = json_object_get_int(maintenance_cost_per_shows_json);
     park->construction_cost_per_seat = json_object_get_int(construction_cost_per_seat_json);
@@ -266,15 +271,6 @@ struct park *deserialize(const char *file) {
       return NULL;
     }
 
-    //Temporary
-
-    double sumServiceRates = 0.0 ;
-
-    for(int i = 0 ; i < park->num_rides ; i++) {
-      sumServiceRates += 1/ park->rides[i].mu;
-    } 
-
-    park->exit_probability = park->park_exit_rate / sumServiceRates;
-
+    park->validation_run = 0;
     return park;
 }

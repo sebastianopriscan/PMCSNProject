@@ -54,6 +54,9 @@ void patience_lost(struct simulation* sim, void *metadata);
 // metadata: struct ride_metadata *
 void ride_server_activate(struct simulation* sim, void *metadata);
 
+// metadata: struct ride_metadata *
+void ride_server_activate_validation(struct simulation* sim, void *metadata);
+
 // metadata: struct client_event *
 void reach_show(struct simulation* sim, void *metadata);
 

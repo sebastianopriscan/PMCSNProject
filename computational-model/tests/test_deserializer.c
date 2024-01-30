@@ -10,8 +10,12 @@ int main(void) {
     fprintf(stderr, "Simulation Time: expected 960.0. Got: %f\n", park->simulation_time);
     return 1;
   }
-  if(park->vip_tickets_percent != 0.5) {
+  if(park->vip_tickets_percent != 0.1) {
     fprintf(stderr, "Vip Tickets: expected 0.5 Got: %f\n", park->vip_tickets_percent);
+    return 1;
+  }
+  if(park->max_vip_tickets != 1) {
+    fprintf(stderr, "Max Vip Tickets: expected 1 Got: %f\n", park->vip_tickets_percent);
     return 1;
   }
   if(park->maintainance_cost_per_rides != 1) {
@@ -92,6 +96,10 @@ int main(void) {
   }
   if(park->rides[0].server_num != 1) {
     fprintf(stderr, "Park Ride Server Num: expected 1 Got: %d\n", park->rides[0].server_num);
+    return 1;
+  }
+  if(park->rides[0].batch_size != 1) {
+    fprintf(stderr, "Park Ride Batch size: expected 1 Got: %d\n", park->rides[0].batch_size);
     return 1;
   }
   if(park->rides[0].mean_time != 0.1) {

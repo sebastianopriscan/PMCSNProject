@@ -29,3 +29,8 @@ add_executable(TestValidationSimulation
 target_link_libraries(TestValidationSimulation PRIVATE NextEventSimulationFramework computational-model)
 add_test(NAME TestValidationSimulation 
       COMMAND TestValidationSimulation)
+
+add_executable(TestPatienceDraws
+  test_patience_draws.c
+)
+target_link_libraries(TestPatienceDraws PRIVATE NextEventSimulationFramework computational-model)

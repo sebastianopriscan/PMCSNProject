@@ -15,12 +15,20 @@
 
 struct statistics_sample_means
 {
-  double mean_mean_delay_normal ;
   double mean_mean_delay_vip ;
-  double mean_mean_delay ;
-  double sum_mean_delay_normal ;
   double sum_mean_delay_vip ;
+
+  double mean_mean_delay_normal ;
+  double sum_mean_delay_normal ;
+
+  double mean_mean_delay ;
   double sum_mean_delay ;
+  
+  double mean_lost_normal;
+  double sum_lost_normal;
+
+  double mean_lost_vip;
+  double sum_lost_vip;
 };
 
 struct statistics_sample_means* stats_means;
@@ -28,13 +36,19 @@ struct statistics_sample_means* stats_means;
 void run_evaluator_on_ride(void *args) {
   struct ride *ride = (struct ride *)args;
   
-  struct return_value* ret_val = run_lambda_evaluator(ride->expected_wait, 0.5, ride->mu, ride->server_num);
+  struct return_value* ret_val = run_lambda_evaluator(ride->expected_wait, 0.5, ride->mu, ride->server_num, ride->batch_size);
   
   ride->popularity = ret_val->lambda ;
   return ;
 }
 
 void do_run(struct park *park) {
+  double mean_normal = 0.0;
+  double sum_normal = 0.0;
+
+  double mean_vip = 0.0;
+  double sum_vip = 0.0;
+
   for (int i = 0; i < NUM_RUNS; i++) {
     for (int j = 0; j < park->num_rides; j++) {
       fprintf(stderr, "Started thread %d\n", j);
@@ -71,27 +85,69 @@ void do_run(struct park *park) {
       double delay_diff = (ride.total_delay_normal + ride.total_delay_vip) / (ride.total_clients_normal + ride.total_clients_normal) - stats_means[j].mean_mean_delay;
       stats_means[j].sum_mean_delay += delay_diff * delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay += delay_diff / (i + 1);
-      double normal_delay_diff = (ride.total_delay_normal / ride.total_clients_normal) - stats_means[i].mean_mean_delay_normal;
+      double normal_delay_diff = (ride.total_delay_normal / ride.total_clients_normal) - stats_means[j].mean_mean_delay_normal;
       stats_means[j].sum_mean_delay_normal += normal_delay_diff * normal_delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay_normal += normal_delay_diff / (i + 1);
-      double vip_delay_diff = (ride.total_delay_vip / ride.total_clients_vip) - stats_means[i].mean_mean_delay_vip;
+      double vip_delay_diff = (ride.total_delay_vip / ride.total_clients_vip) - stats_means[j].mean_mean_delay_vip;
       stats_means[j].sum_mean_delay_vip += vip_delay_diff * vip_delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay_vip += vip_delay_diff / (i + 1);
+
+      double normal_lost_diff = (ride.total_lost_normal / ride.total_clients_normal) - stats_means[j].mean_lost_normal;
+      stats_means[j].sum_lost_normal += normal_lost_diff * normal_lost_diff * ((i + 1) - 1.0) / (i + 1);
+      stats_means[j].mean_lost_normal += normal_lost_diff / (i + 1);
+
+      double vip_lost_diff = (ride.total_lost_vip / ride.total_clients_vip) - stats_means[j].mean_lost_vip;
+      stats_means[j].sum_lost_vip += vip_lost_diff * vip_lost_diff * ((i + 1) - 1.0) / (i + 1);
+      stats_means[j].mean_lost_vip += vip_lost_diff / (i + 1);
     }
+    double normal_diff = state->total_clients_normal - mean_normal;
+    sum_normal += normal_diff * normal_diff * ((i + 1) - 1.0) / (i + 1);
+    mean_normal += normal_diff / (i + 1);
+
+    double vip_diff = state->total_clients_vip - mean_vip;
+    sum_vip += vip_diff * vip_diff * ((i + 1) - 1.0) / (i + 1);
+    mean_vip += vip_diff / (i + 1);
   }
   double u = 1.0 - 0.5 * (1.0 - CONFIDENCE);
   double t = idfStudent(NUM_RUNS - 1, u);
-  printf("Name, Mean Delay, stdev Delay, width Delay, Mean Normal Delay, stdev Normal Delay, width Normal Delay, Mean VIP Delay, stdev VIP Delay, width VIP Delay\n");
+  printf("Name, Mean Delay, stdev Delay, width Delay, Mean Normal Delay, stdev Normal Delay, width Normal Delay, Mean VIP Delay, stdev VIP Delay, width VIP Delay; Mean Lost Normal, stdev Normal Lost, width Normal Lost, VIP Lost Normal, stdev VIP Lost, width VIP Lost\n");
   for (int j = 0; j < park->num_rides; j++) {
+    
     double stdev_delay = sqrt(stats_means[j].sum_mean_delay / NUM_RUNS);
     double w_delay = t * stdev_delay / sqrt(NUM_RUNS - 1);
+    
     double stdev_delay_normal = sqrt(stats_means[j].sum_mean_delay_normal / NUM_RUNS);
     double w_delay_normal = t * stdev_delay_normal / sqrt(NUM_RUNS - 1);
+
     double stdev_delay_vip = sqrt(stats_means[j].sum_mean_delay_vip / NUM_RUNS);
     double w_delay_vip = t * stdev_delay_vip / sqrt(NUM_RUNS - 1);
+    
+    double stdev_lost_normal = sqrt(stats_means[j].sum_lost_normal / NUM_RUNS);
+    double w_lost_normal = t * stdev_lost_normal / sqrt(NUM_RUNS - 1);
+
+    double stdev_lost_vip = sqrt(stats_means[j].sum_lost_vip / NUM_RUNS);
+    double w_lost_vip = t * stdev_lost_vip / sqrt(NUM_RUNS - 1);
+    
     struct statistics_sample_means means = stats_means[j];
-    printf("%s, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f\n", park->rides[j].name, means.mean_mean_delay, stdev_delay, w_delay, means.mean_mean_delay_normal, stdev_delay_normal, w_delay_normal, means.mean_mean_delay_vip, stdev_delay_vip, w_delay_vip);
+    printf("%s, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f\n",
+            park->rides[j].name, 
+            means.mean_mean_delay, stdev_delay, w_delay, 
+            means.mean_mean_delay_normal, stdev_delay_normal, w_delay_normal, 
+            means.mean_mean_delay_vip, stdev_delay_vip, w_delay_vip, 
+            means.mean_lost_normal, stdev_lost_normal, w_lost_normal, 
+            means.mean_lost_vip, stdev_lost_vip, w_lost_vip);
   }
+  
+  double stdev_normal = sqrt(sum_normal / NUM_RUNS);
+  double w_normal = t * stdev_normal / sqrt(NUM_RUNS - 1);
+
+  double stdev_vip = sqrt(sum_vip / NUM_RUNS);
+  double w_vip = t * stdev_vip / sqrt(NUM_RUNS - 1);
+
+  printf("\n\nMean Normal Clients, stdev Normal Clients, width Normal Clients, Mean VIP Clients, stdev VIP Clients, width VIP Clients\n");
+  printf("%6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f\n",
+            mean_normal, stdev_normal, w_normal, 
+            mean_vip, stdev_vip, w_vip);
 }
 
 int main(int argc, char **argv) {
@@ -120,7 +176,7 @@ int main(int argc, char **argv) {
   if(size == 0) {
     fprintf(stderr, "Default run\n");
     do_run(park) ;
-    return;
+    return 0;
   }
 
   struct park *newPark = malloc(sizeof(struct park)) ;
@@ -149,7 +205,7 @@ int main(int argc, char **argv) {
     new_rides[newPark->num_rides + i].sigma = subject_ride->sigma;
     new_rides[newPark->num_rides + i].expected_wait = subject_ride->expected_wait;
     newPark->num_rides += 1;
-    fprintf(stderr, "Added ride %d\n", idx);
+    fprintf(stderr, "Added ride %ld\n", idx);
   }
   do_run(newPark);
 

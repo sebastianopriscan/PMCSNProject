@@ -20,7 +20,10 @@ struct simulation* run_park_simulation(const char *path, int log) {
 struct simulation* run_park_simulation_from_park(struct park *park, int log) {
   int num_queues = 2;
   for (int i = 0; i < park->num_rides; i++) {
-    num_queues += park->rides[i].server_num;
+    if (park->validation_run)
+      num_queues += park->rides[i].server_num;
+    else 
+      num_queues += park->rides[i].server_num / park->rides[i].batch_size;
   }
 
 
@@ -50,6 +53,26 @@ struct simulation* run_park_simulation_from_park(struct park *park, int log) {
         add_event_to_simulation(sim, show_activate_event, SHOW_QUEUE) ;
     }
   }
+  if (!park->validation_run) {
+    int queue_index = 2;
+    for (int i = 0; i < park->num_rides; i++) {
+      for (int j = 0; j < park->rides[i].server_num / park->rides[i].batch_size; j++) {
+        struct ride_metadata *ride_meta = malloc(sizeof(struct ride_metadata));
+        if (ride_meta == NULL) {
+          fprintf(stderr, "Error allocating memory for ride_metadata\n");
+          exit(1);
+        }
+        ride_meta->ride_idx = i;
+        ride_meta->server_idx = j;
+        ride_meta->queue_index = queue_index;
+
+        struct event *ride_event = createEvent(0.0, ride_server_activate, NULL, (void *) ride_meta) ;
+        add_event_to_simulation(sim, ride_event, queue_index) ;
+        queue_index++;
+      }
+    }
+  }
+  
   run_simulation(sim);
   fflush(stdout);
   if (stats_log(sim_state->log)) {
@@ -84,7 +107,10 @@ struct simulation* run_park_simulation_from_park(struct park *park, int log) {
       fprintf(stderr, "\t\tLambda Normal: %f\n", (ride.total_clients_normal) / (ride.last_arrival_normal - ride.first_arrival_normal));
       fprintf(stderr, "\t\tLambda VIP: %f\n", (ride.total_clients_normal + ride.total_clients_vip) / (ride.last_arrival - ride.first_arrival));
       
-      for(int j = 0; j < sim_state->park->rides[i].server_num; j++) {
+      int real_servers = sim_state->park->rides[i].server_num;
+      if (!park->validation_run)
+        real_servers /= sim_state->park->rides[i].batch_size;
+      for(int j = 0; j < real_servers; j++) {
         fprintf(stderr, "\t\tServer %d Mean Service Time (total clients served: %d); %f\n", j, ride.servers_served_clients[j], ride.servers_service_means[j]);
       }
     }

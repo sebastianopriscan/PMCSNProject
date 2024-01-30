@@ -40,9 +40,15 @@ struct sim_state *create_sim_state(struct park *park, int log) {
         rides[i].last_arrival_vip = 0.0;
         rides[i].first_arrival_normal = 0.0 ;
         rides[i].last_arrival_normal = 0.0;
-        rides[i].servers_service_means = malloc(sizeof(double)*park->rides[i].server_num);
-        rides[i].servers_served_clients = malloc(sizeof(int)*park->rides[i].server_num);
-        rides[i].busy_servers = malloc(sizeof(char)*park->rides[i].server_num);
+        if (park->validation_run) {
+            rides[i].servers_service_means = malloc(sizeof(double)*park->rides[i].server_num );
+            rides[i].servers_served_clients = malloc(sizeof(int)*park->rides[i].server_num );
+            rides[i].busy_servers = malloc(sizeof(char)*park->rides[i].server_num );
+        } else {
+            rides[i].servers_service_means = malloc(sizeof(double)*park->rides[i].server_num / park->rides[i].batch_size);
+            rides[i].servers_served_clients = malloc(sizeof(int)*park->rides[i].server_num / park->rides[i].batch_size);
+            rides[i].busy_servers = malloc(sizeof(char)*park->rides[i].server_num / park->rides[i].batch_size);
+        }
         rides[i].vip_queue = create_queue_list();
         rides[i].normal_queue = create_queue_list();
         if (rides[i].busy_servers == NULL || rides[i].normal_queue == NULL || rides[i].vip_queue == NULL || rides[i].servers_service_means == NULL || rides[i].servers_served_clients == NULL) {
@@ -58,9 +64,15 @@ struct sim_state *create_sim_state(struct park *park, int log) {
             free(retVal);
             return NULL;
         }
-        memset(rides[i].busy_servers, 0, park->rides[i].server_num);
-        memset(rides[i].servers_service_means, 0, sizeof(double) * park->rides[i].server_num);
-        memset(rides[i].servers_served_clients, 0, sizeof(int) * park->rides[i].server_num);
+        if (park->validation_run) {
+            memset(rides[i].busy_servers, 0, park->rides[i].server_num );
+            memset(rides[i].servers_service_means, 0, sizeof(double) * park->rides[i].server_num );
+            memset(rides[i].servers_served_clients, 0, sizeof(int) * park->rides[i].server_num );
+        } else {
+            memset(rides[i].busy_servers, 0, park->rides[i].server_num / park->rides[i].batch_size);
+            memset(rides[i].servers_service_means, 0, sizeof(double) * park->rides[i].server_num / park->rides[i].batch_size);
+            memset(rides[i].servers_served_clients, 0, sizeof(int) * park->rides[i].server_num / park->rides[i].batch_size);
+        }
 
         retVal->rides_popularity_total += park->rides[i].popularity ;
     }
@@ -147,7 +159,6 @@ struct sim_state *create_sim_state(struct park *park, int log) {
     }
     evaluate_attraction_probabilities(retVal);
 
-    retVal->available_vip_tickets = 0;
     retVal->clients_in_park = 0 ;
     retVal->clients_in_queue = 0 ;
 

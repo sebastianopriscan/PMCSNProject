@@ -3,7 +3,7 @@
 #endif
 
 #ifndef CLIENT_H
-#define CLINET_H
+#define CLIENT_H
 
 enum client_privilege {
     VIP,

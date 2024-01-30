@@ -1,6 +1,7 @@
 {
     "simulation_time" : 960.0,
-    "vip_tickets": 0.5,
+    "vip_percent": 0.5,
+    "max_vip_tickets": 1,
     "maintenance_cost_per_rides": 1,
     "maintenance_cost_per_shows": 1,
     "construction_cost_per_seat": 1,
@@ -25,6 +26,7 @@
         "name": "Name",
         "popularity": 0.1,
         "server_num": 1,
+        "batch_size": 1,
         "mean_time": 0.1,
         "service_distribution": "normal",
         "mu": 0.1,

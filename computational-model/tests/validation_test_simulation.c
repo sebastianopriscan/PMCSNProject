@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
     park->simulation_time = 1000000.0;
     park->vip_tickets_percent = 0.0;
     park->exit_probability = 0.002778;
+    park->validation_run = 1;
     park->until_end = 0;
     for (int i = 0; i < park->num_rides; i++) {
       park->rides[i].server_num = 1;

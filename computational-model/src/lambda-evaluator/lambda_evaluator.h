@@ -6,6 +6,6 @@ struct return_value {
   double wait_time;
 };
 
-struct return_value* run_lambda_evaluator(double expected_wait, double threshold, double mu, int server_num);
+struct return_value* run_lambda_evaluator(double expected_wait, double threshold, double mu, int server_num, int batch_size);
 
 #endif

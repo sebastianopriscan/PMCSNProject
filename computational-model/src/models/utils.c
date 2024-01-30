@@ -30,32 +30,25 @@ struct client *create_new_client(double clock, double end, struct sim_state* sta
     exit(1);
   }
 
-  double patience_mu = GetRandomFromDistributionType(PATIENCE_MU_STREAM, state->park->patience_distribution, state->park->patience_mu, state->park->patience_sigma);
+  double patience_stdev_percentage = GetRandomFromDistributionType(PATIENCE_MU_STREAM, state->park->patience_distribution, state->park->patience_mu, state->park->patience_sigma);
   double p = GetRandomFromDistributionType(CLIENT_TYPE_STREAM, UNIFORM, 0, 1);
   double exit_time = GetRandomFromDistributionType(EXIT_TIME_STREAM, EXPONENTIAL, 1/(state->park->park_exit_rate), 0);
 
-  patience_mu = patience_mu < 0 ? state->park->patience_mu - state->park->patience_sigma : patience_mu ;
+  patience_stdev_percentage = patience_stdev_percentage < 0 ? 0 : patience_stdev_percentage ;
+  patience_stdev_percentage = patience_stdev_percentage > 1 ? 1 : patience_stdev_percentage;
 
   if (until_end) {
     me->exit_time = clock + exit_time;
   } else {
     me->exit_time = clock + exit_time > end ? end : clock + exit_time;
   }
-  me->client_percentage = patience_mu;
-  if (p > state->park->vip_tickets_percent) {
-    me->type = NORMAL;
-    state->total_clients_normal++;
-    double iptr;
-    if (modf(state->total_clients_normal / state->park->vip_tickets_percent, &iptr) < 0.01 ||
-        modf(state->total_clients_normal / state->park->vip_tickets_percent, &iptr) > 0.89) {
-      state->available_vip_tickets++;
-    }
-  } else {
-    if (state->available_vip_tickets > 0) {
-      state->available_vip_tickets--;
+  me->client_percentage = patience_stdev_percentage;
+  if (p < state->park->vip_tickets_percent && state->total_clients_vip < state->park->max_vip_tickets) {
       me->type = VIP;
       state->total_clients_vip += 1;
-    }
+  } else {
+    me->type = NORMAL;
+    state->total_clients_normal++;
   }
 
   me->lost_patience_times = 0 ;

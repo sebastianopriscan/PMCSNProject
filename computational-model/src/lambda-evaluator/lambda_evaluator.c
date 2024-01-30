@@ -13,13 +13,13 @@
 #include "lambda_evaluator.h"
 
 struct simulation_state {
+  int batch_size;
   double lmba ;
   double mu ;
   double sigma ;
   unsigned int n_Clients ;
   unsigned int vip_Clients ;
   unsigned int n_of_Servers ;
-  unsigned char *servers_status ;
 
   unsigned int total_clients_normal;
   unsigned int total_clients_vip;
@@ -32,20 +32,15 @@ struct simulation_state {
   struct generic_queue_list *normal_arrivals;
 } ;
 
-struct simulation_state *init_state(unsigned int servNum, double lmba, double mu, double sigma)
+struct simulation_state *init_state(unsigned int servNum, int batch_size, double lmba, double mu, double sigma)
 {
   struct simulation_state *val;
   if((val = malloc(sizeof(struct simulation_state))) == NULL)  {
     perror("Failed to allocate simulation state");
     exit(1);
   }
-
-  if ((val->servers_status = malloc(sizeof(char) * servNum)) == NULL) {
-    perror("Failed to allocate servers_status");
-    free(val);
-    exit(1);
-  }
   
+  val->batch_size = batch_size;
   val->lmba = lmba;
   val->mu = mu;
   val->sigma = sigma ;
@@ -58,11 +53,6 @@ struct simulation_state *init_state(unsigned int servNum, double lmba, double mu
   val->total_delay_vip = 0.0;
   val->total_service_time_normal = 0.0;
   val->total_service_time_vip = 0.0;
-
-  for (int i = 0; i < servNum; i++)
-  {
-    val->servers_status[i] = 0;
-  }
 
   val->vip_arrivals = create_queue_list() ;
   val->normal_arrivals = create_queue_list();
@@ -79,7 +69,6 @@ void destroy_state(struct simulation_state *state)
 {
   destroy_generic_queue_list(state->vip_arrivals);
   destroy_generic_queue_list(state->normal_arrivals);
-  free(state->servers_status) ;
   free(state) ;
 }
 
@@ -89,42 +78,36 @@ void server_activate(struct simulation *sim, void *metadata)
   SelectStream(i + 1) ;
   struct simulation_state *state = (struct simulation_state*) sim->state;
 
-  double service_time = 0.0;
-  
-  if (state->vip_Clients >0 || state->n_Clients > 0)
-    //service_time = Exponential(1.0 / state->mu) ;
-    service_time = Normal(state->mu, state->sigma) ;
+  double service_time = Normal(state->mu, state->sigma) ;
 
+  int actual_served = 0;
   if(state->vip_Clients > 0) {
-    state->vip_Clients -= 1;
-    struct double_value *value = (struct double_value *) generic_dequeue_element(state->vip_arrivals);
-    if (value == NULL) {
-      perror("Error while dequeue-ing from vip_arrivals. Exiting...");
-      exit(1);
+    for (int j = 0; j < state->batch_size; j++) {
+      state->vip_Clients -= 1;
+      struct double_value *value = (struct double_value *) generic_dequeue_element(state->vip_arrivals);
+      if (value == NULL) {
+        break;
+      }
+      state->total_delay_vip += sim->clock - value->value;
+      free(value) ;
+      state->total_service_time_vip += service_time;
+      state->total_clients_vip += 1;
+      actual_served ++;
     }
-    state->total_delay_vip += sim->clock - value->value;
-    free(value) ;
-    state->total_service_time_vip += service_time;
-    state->total_clients_vip += 1;
   }
   else if (state->n_Clients > 0) {
-    state->n_Clients -= 1;
-    struct double_value *value = (struct double_value *) generic_dequeue_element(state->normal_arrivals);
-    if (value == NULL) {
-      perror("Error while dequeue-ing from normal_arrivals. Exiting...");
-      exit(1);
+    for (int j = 0; j < state->batch_size - actual_served; j++) {
+      state->n_Clients -= 1;
+      struct double_value *value = (struct double_value *) generic_dequeue_element(state->normal_arrivals);
+      if (value == NULL) {
+        break;
+      }
+      state->total_delay_normal += sim->clock - value->value;
+      free(value);
+      state->total_service_time_normal += service_time ;
+      state->total_clients_normal += 1;
     }
-    state->total_delay_normal += sim->clock - value->value;
-    free(value);
-    state->total_service_time_normal += service_time ;
-    state->total_clients_normal += 1;
   }
-  else {
-    state->servers_status[i] = 0;
-    return ;
-  }
-
-  state->servers_status[i] = 1;
 
   double next = sim->clock + service_time;
 
@@ -160,16 +143,6 @@ void arrivalPayload(struct simulation *sim, void *metadata) {
         exit(1) ;
       }
     }
-
-    for(int i = 0 ; i < state->n_of_Servers ; i++)
-    {
-      if(state->servers_status[i] == 0)
-      {
-        struct event * event = createEvent(sim->clock, server_activate, NULL, (void *)i) ;
-        add_event_to_simulation(sim, event, i+1);
-        break;
-      }
-    }
 }
 
 void next_arrival(struct simulation *sim, void *metadata) {
@@ -185,16 +158,20 @@ void next_arrival(struct simulation *sim, void *metadata) {
     add_event_to_simulation(sim, event1, 0);
 }
 
-struct simulation *run_single_simulation(double lambda, double mu, int server_num) {
-    struct simulation_state* state = init_state(server_num, lambda, mu, 0.1 * mu);
-    struct simulation *sim = create_simulation(server_num + 1, 960, (char *) state);
+struct simulation *run_single_simulation(double lambda, double mu, int server_num, int batch_size) {
+    struct simulation_state* state = init_state(server_num, batch_size, lambda, mu, 0.1 * mu);
+    struct simulation *sim = create_simulation(server_num / batch_size + 1, 720, (char *) state);
     struct event *event = createEvent(0.0, next_arrival, NULL, NULL);
     add_event_to_simulation(sim, event, 0);
+    for (int i = 0; i < server_num / batch_size; i++) {
+      struct event *ride_event = createEvent(0.0, server_activate, NULL, (void *) i);
+      add_event_to_simulation(sim, ride_event, 0);
+    }
     run_simulation(sim);
     return sim ;
 }
 
-struct return_value* run_lambda_evaluator(double expected_wait, double threshold, double mu, int server_num) {
+struct return_value* run_lambda_evaluator(double expected_wait, double threshold, double mu, int server_num, int batch_size) {
   double lambda = 1.0;
   double checker = 0.0;
   double real_wait = 0.0;
@@ -215,7 +192,7 @@ struct return_value* run_lambda_evaluator(double expected_wait, double threshold
 
   //find upper and lower bounds for lambda
   do {
-    struct simulation *sim = run_single_simulation(lambda, mu, server_num);
+    struct simulation *sim = run_single_simulation(lambda, mu, server_num, batch_size);
     struct simulation_state *state = (struct simulation_state*)(sim->state);
     double total_delay = state->total_delay_normal + state->total_delay_vip ;
     real_wait = total_delay / (state->total_clients_normal + state->total_clients_vip);
@@ -255,7 +232,7 @@ struct return_value* run_lambda_evaluator(double expected_wait, double threshold
   do {
     lambda = (lambda_upper_bound + lambda_lower_bound) / 2.0;
 
-    struct simulation *sim = run_single_simulation(lambda, mu, server_num);
+    struct simulation *sim = run_single_simulation(lambda, mu, server_num, batch_size);
     struct simulation_state *state = (struct simulation_state*)(sim->state);
     double total_delay = state->total_delay_normal + state->total_delay_vip ;
     real_wait = total_delay / (state->total_clients_normal + state->total_clients_vip);

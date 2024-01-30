@@ -77,7 +77,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   // NOTE: check for patience sigma
   if (state->park->patience_enabled) {
     double mean_time = state->park->rides[selected_ride_idx].mu;
-    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, mean_time, mean_time * me->client_percentage);
+    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, mean_time + 10.0, mean_time * me->client_percentage);
 
     patience = patience < 0 ? -patience : patience ;
 
@@ -100,6 +100,9 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   if(state->rides[selected_ride_idx].first_arrival_vip == 0.0 && me->type == VIP)
     state->rides[selected_ride_idx].first_arrival_vip = sim->clock;
 
+  if (!state->park->validation_run) 
+    return;
+
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
   {
     if (state->rides[selected_ride_idx].busy_servers[i] == 0) {
@@ -120,7 +123,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 
       state->rides[selected_ride_idx].busy_servers[i] = 1;
 
-      struct event *activate_server = createUndiscardableEvent(sim->clock, ride_server_activate, NULL, (void *) rideMetadata);
+      struct event *activate_server = createUndiscardableEvent(sim->clock, ride_server_activate_validation, NULL, (void *) rideMetadata);
       add_event_to_simulation(sim, activate_server, queue_index);
       return ;
     }
@@ -170,6 +173,10 @@ void reach_park(struct simulation *sim, void *metadata) {
 
 void next_reach(struct simulation *sim, void *metadata) {
   struct sim_state*state = (struct sim_state*)sim->state;
+  // Arrivals are concentrated in the first 5 hours
+  if (sim->clock > 300.0) {
+    return;
+  }
   if(client_log(state->log))
     printf("launched next_reach at %f\n", sim->clock);
   double next = GetRandomFromDistributionType(NEXT_ARRIVAL_STREAM, EXPONENTIAL, 1/(state->park->park_arrival_rate), 0);
@@ -185,13 +192,16 @@ void choose_delay(struct simulation* sim, void *metadata) {
   double delay = 0.0;
   if(state->park->delay_enabled)
     delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
-  // if(sim->clock + delay > client->exit_time) {
-  if(GetRandomFromDistributionType(POPULARITY_STREAM, UNIFORM, 0, 1) < state->park->exit_probability) {
+    
+  int condition  = sim->clock + delay > client->exit_time;
+  if(state->park->validation_run)
+    condition = GetRandomFromDistributionType(POPULARITY_STREAM, UNIFORM, 0, 1) < state->park->exit_probability;
+
+  if (condition) {
     state->total_clients_exited += 1;
     state->total_permanence += (sim->clock - client->arrival_time);
-    // fprintf(stderr, "A client stayed for %6.6f: clock: %6.6f, arrival: %6.6f\n", sim->clock - client->arrival_time, sim->clock, client->arrival_time) ;
-    // generic_remove_element(state->clients, client);
-    // free(client) ;
+    generic_remove_element(state->clients, client);
+    free(client) ;
     state->clients_in_park -= 1;
     if (state->clients_in_queue > 0) {
       struct event* reach_park_event = createEvent(sim->clock, reach_park, NULL, NULL);
