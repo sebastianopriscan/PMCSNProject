@@ -89,8 +89,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   if (me->type == VIP) {
     generic_enqueue_element(state->rides[selected_ride_idx].vip_queue, client_ev);
     state->rides[selected_ride_idx].total_arrived_vip += 1;
-  }
-   else {
+  } else {
     generic_enqueue_element(state->rides[selected_ride_idx].normal_queue, client_ev);
     state->rides[selected_ride_idx].total_arrived_normal += 1;
    }

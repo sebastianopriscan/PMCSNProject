@@ -84,34 +84,38 @@ void do_run(struct park *park) {
     for(int j = 0; j < park->num_rides; j++) {
       struct ride_state ride = state->rides[j];
       double delay_diff = 0.0;
-      if (ride.total_arrived_normal + ride.total_arrived_vip != 0) {
+      if (ride.total_arrived_normal + ride.total_arrived_vip != 0) 
         delay_diff = (ride.total_delay_normal + ride.total_delay_vip) / (ride.total_arrived_normal + ride.total_arrived_vip) - stats_means[j].mean_mean_delay;
-        fprintf(stderr, "Run %d: total_arrived_normal + total_arrived_vip is 0\n");
-      }
+      else
+        fprintf(stderr, "Run %d: total_arrived_normal + total_arrived_vip is 0\n", i);
+      
       stats_means[j].sum_mean_delay += delay_diff * delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay += delay_diff / (i + 1);
       
       double normal_delay_diff = 0.0;
-      if (ride.total_arrived_normal != 0) {
+      if (ride.total_arrived_normal != 0) 
         normal_delay_diff = (ride.total_delay_normal / ride.total_arrived_normal) - stats_means[j].mean_mean_delay_normal;
+      else
         fprintf(stderr, "Run %d, ride %d: total_arrived_normal is 0\n", i, j);
-      }
+      
       stats_means[j].sum_mean_delay_normal += normal_delay_diff * normal_delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay_normal += normal_delay_diff / (i + 1);
       
       double vip_delay_diff = 0.0;
-      if (ride.total_arrived_vip != 0) {
+      if (ride.total_arrived_vip != 0) 
         vip_delay_diff = (ride.total_delay_vip / ride.total_arrived_vip) - stats_means[j].mean_mean_delay_vip;
+      else
         fprintf(stderr, "Run %d, ride %d: total_arrived_vip is 0\n", i, j);
-      }
+      
       stats_means[j].sum_mean_delay_vip += vip_delay_diff * vip_delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay_vip += vip_delay_diff / (i + 1);
 
       double normal_lost_diff = 0.0;
-      if (ride.total_arrived_normal != 0) {
+      if (ride.total_arrived_normal != 0) 
         normal_lost_diff = (ride.total_lost_normal / ride.total_arrived_normal) - stats_means[j].mean_lost_normal;
+      else
         fprintf(stderr, "Run %d, ride %d: total_arrived_normal is 0\n", i, j);
-      }
+      
       stats_means[j].sum_lost_normal += normal_lost_diff * normal_lost_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_lost_normal += normal_lost_diff / (i + 1);
 
