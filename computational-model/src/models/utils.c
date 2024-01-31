@@ -34,7 +34,7 @@ struct client *create_new_client(double clock, double end, struct sim_state* sta
   double p = GetRandomFromDistributionType(CLIENT_TYPE_STREAM, UNIFORM, 0, 1);
   double exit_time = GetRandomFromDistributionType(EXIT_TIME_STREAM, EXPONENTIAL, 1/(state->park->park_exit_rate), 0);
 
-  patience_stdev_percentage = patience_stdev_percentage < 0 ? 0 : patience_stdev_percentage ;
+  patience_stdev_percentage = patience_stdev_percentage < 0 ? -patience_stdev_percentage : patience_stdev_percentage ;
   patience_stdev_percentage = patience_stdev_percentage > 1 ? 1 : patience_stdev_percentage;
 
   if (until_end) {

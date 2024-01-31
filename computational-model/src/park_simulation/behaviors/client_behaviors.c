@@ -190,8 +190,10 @@ void choose_delay(struct simulation* sim, void *metadata) {
     printf("launched choose_delay at %f\n", sim->clock);
   struct client *client = (struct client *) metadata ;
   double delay = 0.0;
-  if(state->park->delay_enabled)
+  if(state->park->delay_enabled) {
     delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
+    delay = delay < 0 ? -delay : delay ;
+  }
     
   int condition  = sim->clock + delay > client->exit_time;
   if(state->park->validation_run)

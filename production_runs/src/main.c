@@ -39,6 +39,7 @@ void run_evaluator_on_ride(void *args) {
   struct return_value* ret_val = run_lambda_evaluator(ride->expected_wait, 0.5, ride->mu, ride->server_num, ride->batch_size);
   
   ride->popularity = ret_val->lambda ;
+  free(ret_val) ;
   return ;
 }
 
@@ -62,7 +63,7 @@ void do_run(struct park *park) {
       total_lambda += park->rides[j].popularity; // contains the temporary value for lambda
     }
 
-    double total_popularity ;
+    double total_popularity = 0.0;
     total_lambda += total_lambda / (park->num_rides + 1);
 
     for(int j = 0 ; j < park->num_rides; j++) {
@@ -82,7 +83,7 @@ void do_run(struct park *park) {
     struct sim_state *state = (struct sim_state*) sim->state;
     for(int j = 0; j < park->num_rides; j++) {
       struct ride_state ride = state->rides[j];
-      double delay_diff = (ride.total_delay_normal + ride.total_delay_vip) / (ride.total_clients_normal + ride.total_clients_normal) - stats_means[j].mean_mean_delay;
+      double delay_diff = (ride.total_delay_normal + ride.total_delay_vip) / (ride.total_clients_normal + ride.total_clients_vip) - stats_means[j].mean_mean_delay;
       stats_means[j].sum_mean_delay += delay_diff * delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay += delay_diff / (i + 1);
       double normal_delay_diff = (ride.total_delay_normal / ride.total_clients_normal) - stats_means[j].mean_mean_delay_normal;
@@ -193,8 +194,10 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  newPark->rides = new_rides ;
+
   for (int i = 0 ; i < size; i++) {
-    long idx = strtol(argv[2 + i], NULL, 10);
+    long idx = strtol(argv[3 + i], NULL, 10);
     struct ride *subject_ride = &(newPark->disabled_rides[idx]);
     new_rides[newPark->num_rides + i].name = subject_ride->name;
     new_rides[newPark->num_rides + i].popularity = subject_ride->popularity;
@@ -204,9 +207,10 @@ int main(int argc, char **argv) {
     new_rides[newPark->num_rides + i].mu = subject_ride->mu;
     new_rides[newPark->num_rides + i].sigma = subject_ride->sigma;
     new_rides[newPark->num_rides + i].expected_wait = subject_ride->expected_wait;
-    newPark->num_rides += 1;
+    new_rides[newPark->num_rides + i].batch_size = subject_ride->batch_size ;
     fprintf(stderr, "Added ride %ld\n", idx);
   }
+  newPark->num_rides += size;
   do_run(newPark);
 
   return 0;
