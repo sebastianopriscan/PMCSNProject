@@ -19,8 +19,10 @@ struct ride_state {
   struct generic_queue_list *normal_queue;
 
   // Statistics
-  int total_clients_normal;
-  int total_clients_vip;
+  int total_clients_normal; // Total served normal
+  int total_clients_vip; // Total served VIP
+  int total_arrived_normal;
+  int total_arrived_vip;
   double total_delay_normal;
   double total_delay_vip;
 
