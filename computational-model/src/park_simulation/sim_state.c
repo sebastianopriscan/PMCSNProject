@@ -27,6 +27,8 @@ struct sim_state *create_sim_state(struct park *park, int log) {
     for(int i = 0; i < park->num_rides; i++) {
         rides[i].total_clients_normal = 0;
         rides[i].total_clients_vip = 0;
+        rides[i].total_arrived_normal = 0;
+        rides[i].total_arrived_vip = 0;
         rides[i].total_delay_normal = 0.0;
         rides[i].total_delay_vip = 0.0;
         rides[i].total_lost_normal = 0 ;

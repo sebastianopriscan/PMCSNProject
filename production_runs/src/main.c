@@ -52,7 +52,7 @@ void do_run(struct park *park) {
 
   for (int i = 0; i < NUM_RUNS; i++) {
     for (int j = 0; j < park->num_rides; j++) {
-      fprintf(stderr, "Started thread %d\n", j);
+      fprintf(stderr, "Started lambda evaluator for ride %d\n", j);
       run_evaluator_on_ride((void *)&park->rides[j]);
     }
 
@@ -83,21 +83,43 @@ void do_run(struct park *park) {
     struct sim_state *state = (struct sim_state*) sim->state;
     for(int j = 0; j < park->num_rides; j++) {
       struct ride_state ride = state->rides[j];
-      double delay_diff = (ride.total_delay_normal + ride.total_delay_vip) / (ride.total_clients_normal + ride.total_clients_vip) - stats_means[j].mean_mean_delay;
+      double delay_diff = 0.0;
+      if (ride.total_arrived_normal + ride.total_arrived_vip != 0) {
+        delay_diff = (ride.total_delay_normal + ride.total_delay_vip) / (ride.total_arrived_normal + ride.total_arrived_vip) - stats_means[j].mean_mean_delay;
+        fprintf(stderr, "Run %d: total_arrived_normal + total_arrived_vip is 0\n");
+      }
       stats_means[j].sum_mean_delay += delay_diff * delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay += delay_diff / (i + 1);
-      double normal_delay_diff = (ride.total_delay_normal / ride.total_clients_normal) - stats_means[j].mean_mean_delay_normal;
+      
+      double normal_delay_diff = 0.0;
+      if (ride.total_arrived_normal != 0) {
+        normal_delay_diff = (ride.total_delay_normal / ride.total_arrived_normal) - stats_means[j].mean_mean_delay_normal;
+        fprintf(stderr, "Run %d, ride %d: total_arrived_normal is 0\n", i, j);
+      }
       stats_means[j].sum_mean_delay_normal += normal_delay_diff * normal_delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay_normal += normal_delay_diff / (i + 1);
-      double vip_delay_diff = (ride.total_delay_vip / ride.total_clients_vip) - stats_means[j].mean_mean_delay_vip;
+      
+      double vip_delay_diff = 0.0;
+      if (ride.total_arrived_vip != 0) {
+        vip_delay_diff = (ride.total_delay_vip / ride.total_arrived_vip) - stats_means[j].mean_mean_delay_vip;
+        fprintf(stderr, "Run %d, ride %d: total_arrived_vip is 0\n", i, j);
+      }
       stats_means[j].sum_mean_delay_vip += vip_delay_diff * vip_delay_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_mean_delay_vip += vip_delay_diff / (i + 1);
 
-      double normal_lost_diff = (ride.total_lost_normal / ride.total_clients_normal) - stats_means[j].mean_lost_normal;
+      double normal_lost_diff = 0.0;
+      if (ride.total_arrived_normal != 0) {
+        normal_lost_diff = (ride.total_lost_normal / ride.total_arrived_normal) - stats_means[j].mean_lost_normal;
+        fprintf(stderr, "Run %d, ride %d: total_arrived_normal is 0\n", i, j);
+      }
       stats_means[j].sum_lost_normal += normal_lost_diff * normal_lost_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_lost_normal += normal_lost_diff / (i + 1);
 
-      double vip_lost_diff = (ride.total_lost_vip / ride.total_clients_vip) - stats_means[j].mean_lost_vip;
+      double vip_lost_diff = 0.0;
+      if (ride.total_arrived_vip != 0) {
+        vip_lost_diff = (ride.total_lost_vip / ride.total_arrived_vip) - stats_means[j].mean_lost_vip;
+        fprintf(stderr, "Run %d, ride %d: total_arrived_vip is 0\n", i, j);
+      }
       stats_means[j].sum_lost_vip += vip_lost_diff * vip_lost_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_lost_vip += vip_lost_diff / (i + 1);
     }
