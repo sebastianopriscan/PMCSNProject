@@ -108,7 +108,10 @@ void ride_server_activate(struct simulation *sim, void *metadata)
         delete_event_from_simulation(sim, CLIENT_QUEUE, value->event) ; //TODO: Check if client queue is too busy, and evaluate moving to dedicated queue
   
       struct event* choose_delay_event = createUndiscardableEvent(next, choose_delay, NULL, value->client);
-      add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);
+      int code = add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);
+      if(code == 1) {
+        free(choose_delay_event) ;
+      }
       
       free(value) ;
       actual_served++ ;
@@ -129,7 +132,10 @@ void ride_server_activate(struct simulation *sim, void *metadata)
         delete_event_from_simulation(sim, CLIENT_QUEUE, value->event) ; //TODO: Check if client queue is too busy, and evaluate moving to dedicated queue
 
       struct event* choose_delay_event = createUndiscardableEvent(next, choose_delay, NULL, value->client);
-      add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);
+      int code = add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);
+      if(code == 1) {
+        free(choose_delay_event) ;
+      }
 
       free(value);
     }
@@ -142,5 +148,9 @@ void ride_server_activate(struct simulation *sim, void *metadata)
   state->rides[ride_meta->ride_idx].servers_service_means[ride_meta->server_idx] = (old_sum + service_time) / (++state->rides[ride_meta->ride_idx].servers_served_clients[ride_meta->server_idx]);
 
   struct event* next_server_activate_event = createUndiscardableEvent(next, ride_server_activate, NULL, metadata);
-  add_event_to_simulation(sim, next_server_activate_event, ride_meta->queue_index);
+  int code = add_event_to_simulation(sim, next_server_activate_event, ride_meta->queue_index);
+  if(code == 1) {
+    free(metadata) ;
+    free(next_server_activate_event) ;
+  }
 }

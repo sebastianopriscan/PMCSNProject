@@ -7,6 +7,16 @@
 #include "../models/model.h"
 #include "sim_state.h"
 
+void empty_generic_queue_list(struct generic_queue_list *queue) {
+    void *payload ;
+
+    do {
+        payload = generic_dequeue_element(queue) ;
+        if(payload != NULL)
+            free(payload) ;
+    } while(payload != NULL) ;
+}
+
 struct sim_state *create_sim_state(struct park *park, int log) {
     struct sim_state *retVal ;
     if((retVal = malloc(sizeof(struct sim_state))) == NULL) {
@@ -195,17 +205,21 @@ struct sim_state *create_sim_state(struct park *park, int log) {
 
 void delete_sim_state(struct sim_state *state) {
     for (int i = 0; i < state->park->num_rides; i++) {
+            empty_generic_queue_list(state->rides[i].vip_queue) ;
+            empty_generic_queue_list(state->rides[i].normal_queue) ;
             destroy_generic_queue_list(state->rides[i].vip_queue);
             destroy_generic_queue_list(state->rides[i].normal_queue);
             free(state->rides[i].busy_servers) ;
             free(state->rides[i].servers_service_means);
             free(state->rides[i].servers_served_clients);
     }
+    empty_generic_queue_list(state->clients) ;
     destroy_generic_queue_list(state->clients) ;
     free(state->rides);
     free(state->shows);
     free(state->active_shows);
     free(state->popularities);
+    empty_generic_queue_list(state->entrance_queue_arrival_times) ;
     destroy_generic_queue_list(state->entrance_queue_arrival_times);
     free(state);
 }

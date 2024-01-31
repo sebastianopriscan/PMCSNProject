@@ -83,7 +83,10 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 
     struct event *lose_patience = createEvent(sim->clock + patience, patience_lost, NULL, client_ev);
     client_ev->event = lose_patience;
-    add_event_to_simulation(sim, lose_patience, CLIENT_QUEUE);
+    int code = add_event_to_simulation(sim, lose_patience, CLIENT_QUEUE);
+    if(code == 1) {
+      free(lose_patience) ;
+    }
   }
 
   if (me->type == VIP) {
@@ -184,7 +187,10 @@ void next_reach(struct simulation *sim, void *metadata) {
     printf("launched next_reach at %f\n", sim->clock);
   double next = GetRandomFromDistributionType(NEXT_ARRIVAL_STREAM, EXPONENTIAL, 1/(state->park->park_arrival_rate), 0);
   struct event* event = createEvent(sim->clock + next, reach_park, next_reach, NULL);
-  add_event_to_simulation(sim, event, CLIENT_QUEUE);
+  int code = add_event_to_simulation(sim, event, CLIENT_QUEUE);
+  if(code == 1) {
+    free(event) ;
+  }
 }
 
 void choose_delay(struct simulation* sim, void *metadata) {

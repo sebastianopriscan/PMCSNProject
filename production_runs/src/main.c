@@ -135,6 +135,9 @@ void do_run(struct park *park) {
     double vip_diff = state->total_clients_vip - mean_vip;
     sum_vip += vip_diff * vip_diff * ((i + 1) - 1.0) / (i + 1);
     mean_vip += vip_diff / (i + 1);
+
+    delete_sim_state(state) ;
+    destroy_simulation(sim) ;
   }
   double u = 1.0 - 0.5 * (1.0 - CONFIDENCE);
   double t = idfStudent(NUM_RUNS - 1, u);
