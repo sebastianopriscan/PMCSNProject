@@ -7,6 +7,7 @@
 #include "../../computational-model/src/models/model.h"
 #include "../../computational-model/src/deserializer/deserializer.h"
 #include "simulation/simulation.h"
+#include <rngs.h>
 #include <rvms.h>
 #include <math.h>
 
@@ -49,6 +50,8 @@ void do_run(struct park *park) {
 
   double mean_vip = 0.0;
   double sum_vip = 0.0;
+
+  PlantSeeds(12345);
 
   for (int i = 0; i < NUM_RUNS; i++) {
     for (int j = 0; j < park->num_rides; j++) {

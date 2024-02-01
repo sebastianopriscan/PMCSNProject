@@ -86,6 +86,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
     int code = add_event_to_simulation(sim, lose_patience, CLIENT_QUEUE);
     if(code == 1) {
       free(lose_patience) ;
+      client_ev->event = NULL;
     }
   }
 
