@@ -89,6 +89,7 @@ void server_activate(struct simulation *sim, void *metadata)
   struct simulation_state *state = (struct simulation_state*) sim->state;
 
   double service_time = Normal(state->mu, state->sigma) ;
+  service_time = service_time < 0 ? state->mu : service_time ;
 
   int actual_served = 0;
   if(state->vip_Clients > 0) {

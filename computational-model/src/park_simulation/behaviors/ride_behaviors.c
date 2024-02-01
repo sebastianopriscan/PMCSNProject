@@ -20,6 +20,7 @@ void ride_server_activate_validation(struct simulation *sim, void *metadata)
     
     struct ride ride = state->park->rides[ride_meta->ride_idx];
     service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.sigma);
+    service_time = service_time < 0 ? ride.mu : service_time ;
   }
 
   double arrival_time = 0.0;
@@ -89,6 +90,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
 
   struct ride ride = state->park->rides[ride_meta->ride_idx];
   double service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.sigma);
+  service_time = service_time < 0 ? ride.mu : service_time ;
   double next = sim->clock + service_time;
 
   double arrival_time = 0.0;
