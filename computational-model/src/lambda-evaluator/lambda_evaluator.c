@@ -104,7 +104,8 @@ void server_activate(struct simulation *sim, void *metadata)
       actual_served ++;
     }
   }
-  else if (state->n_Clients > 0) {
+
+  if (state->n_Clients > 0) {
     for (int j = 0; j < state->batch_size - actual_served; j++) {
       state->n_Clients -= 1;
       struct double_value *value = (struct double_value *) generic_dequeue_element(state->normal_arrivals);

@@ -119,7 +119,8 @@ void ride_server_activate(struct simulation *sim, void *metadata)
       actual_served++ ;
     }
   }
-  else if (state->rides[ride_meta->ride_idx].normal_queue->head != NULL) {
+  
+  if (state->rides[ride_meta->ride_idx].normal_queue->head != NULL) {
     for (int i = 0; i < ride.batch_size - actual_served; i++) {
       struct client_event *value = (struct client_event *) generic_dequeue_element(state->rides[ride_meta->ride_idx].normal_queue);
       if (value == NULL) {
