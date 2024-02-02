@@ -34,6 +34,17 @@ target_link_libraries(lambda-evaluator-executable PRIVATE lambda_evaluator)
 target_link_libraries(lambda-evaluator-executable PRIVATE NextEventSimulationFramework)
 target_link_libraries(lambda-evaluator-executable PRIVATE json-c)
 
+set_target_properties(lambda-evaluator-executable PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+)
+
+add_custom_command(TARGET lambda-evaluator-executable POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_FILE:lambda-evaluator-executable>
+            ${CMAKE_SOURCE_DIR}/bin/
+    COMMENT "Copying MyExecutable to bin directory"
+)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   enable_testing()
   add_subdirectory(tests)

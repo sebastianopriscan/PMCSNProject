@@ -54,27 +54,6 @@ void do_run(struct park *park) {
   PlantSeeds(12345);
 
   for (int i = 0; i < NUM_RUNS; i++) {
-    for (int j = 0; j < park->num_rides; j++) {
-      fprintf(stderr, "Started lambda evaluator for ride %d\n", j);
-      run_evaluator_on_ride((void *)&park->rides[j]);
-    }
-
-    fprintf(stderr, "Lambda evaluator finished\n");
-
-    double total_lambda = 0 ;
-    for (int j = 0; j < park->num_rides; j++) {
-      total_lambda += park->rides[j].popularity; // contains the temporary value for lambda
-    }
-
-    double total_popularity = 0.0;
-    total_lambda += total_lambda / (park->num_rides + 1);
-
-    for(int j = 0 ; j < park->num_rides; j++) {
-        park->rides[j].popularity = park->rides[j].popularity / total_lambda ;
-        total_popularity += park->rides[j].popularity;
-    }
-
-    park->shows[0].popularity = 1 - total_popularity ;
     
     // Run production run
     struct simulation* sim = run_park_simulation_from_park(park, 0);
