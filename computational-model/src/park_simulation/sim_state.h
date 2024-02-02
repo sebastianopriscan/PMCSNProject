@@ -17,13 +17,18 @@ struct ride_state {
   char *busy_servers ;
   struct generic_queue_list *vip_queue;
   struct generic_queue_list *normal_queue;
+  struct generic_queue_list *real_reserved_queue; // Client really in queue
+  struct generic_queue_list *reserved_queue; // Client that reserved a place in the queue
 
   // Statistics
   int total_clients_normal; // Total served normal
+  int total_clients_reserved; // Total served reserved
   int total_clients_vip; // Total served VIP
   int total_arrived_normal;
+  int total_reservations;
   int total_arrived_vip;
   double total_delay_normal;
+  double total_delay_reserved;
   double total_delay_vip;
 
   int total_lost_normal ;

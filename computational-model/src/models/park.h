@@ -39,6 +39,7 @@ struct park {
 
     double exit_probability; // Used for Jackson validation
     int validation_run;
+    int improved_run;
     int max_vip_tickets;
 } ;
 

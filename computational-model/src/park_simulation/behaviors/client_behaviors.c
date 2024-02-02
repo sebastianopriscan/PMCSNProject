@@ -6,6 +6,33 @@
 
 #define client_log(log) (log & 0b0001) 
 
+int position_in_queue(void *first, void *second) {
+  struct client_event *first_client = (struct client_event *) first ;
+  struct client_event *second_client = (struct client_event *) second ;
+
+  struct reservation *first_reservation;
+  for(int i = 0; i < 5; i++) {
+    if (first_client->client->active_reservations[i].expired || first_client->client->active_reservations[i].ride_idx != first_client->selected_attraction_idx)
+      continue;
+    first_reservation = &first_client->client->active_reservations[i];
+  }
+  
+  struct reservation *second_reservation;
+  for(int i = 0; i < 5; i++) {
+    if (second_client->client->active_reservations[i].expired || second_client->client->active_reservations[i].ride_idx != second_client->selected_attraction_idx)
+      continue;
+    second_reservation = &second_client->client->active_reservations[i];
+  }
+
+  if(first_reservation->clients_left < second_reservation->clients_left) {
+    return 1 ;
+  } else if (first_reservation->clients_left == second_reservation->clients_left) {
+    return 0 ;
+  } else {
+    return -1 ;
+  }
+}
+
 void patience_lost(struct simulation *sim, void *metadata) {
   struct sim_state *state = (struct sim_state *)sim->state;
 
@@ -199,12 +226,33 @@ void choose_delay(struct simulation* sim, void *metadata) {
   if(client_log(state->log))
     printf("launched choose_delay at %f\n", sim->clock);
   struct client *client = (struct client *) metadata ;
+
+  if (state->park->improved_run) {
+    for(int i = 0; i < 5; i++) {
+      if (client->active_reservations[i].expired) 
+        continue;
+      int ride_idx = client->active_reservations[i].ride_idx;
+      struct ride_state ride = state->rides[ride_idx];
+      struct ride park_ride = state->park->rides[ride_idx];
+      double estimation = (ride.vip_queue->size + client->active_reservations[i].clients_left) * park_ride.mu / (park_ride.server_num / park_ride.batch_size);
+      if (estimation < state->park->delay_mu && !client->active_reservations[i].expired) {
+        struct client_event *client_ev = malloc(sizeof(struct client_event));
+        client_ev->client = client;
+        client_ev->arrival_time = sim->clock;
+        client_ev->selected_attraction_idx = ride_idx;
+        client_ev->event = NULL;        
+        generic_insert_element(state->rides[client->active_reservations[i].ride_idx].real_reserved_queue, client_ev, position_in_queue);
+        return;
+      }
+    }
+  }
+
   double delay = 0.0;
   if(state->park->delay_enabled) {
     delay = GetRandomFromDistributionType(DELAY_STREAM, state->park->delay_distribution, state->park->delay_mu, state->park->delay_sigma);
     delay = delay < 0 ? -delay : delay ;
   }
-    
+
   int condition  = sim->clock + delay > client->exit_time;
   if(state->park->validation_run)
     condition = GetRandomFromDistributionType(POPULARITY_STREAM, UNIFORM, 0, 1) < state->park->exit_probability;
@@ -221,7 +269,46 @@ void choose_delay(struct simulation* sim, void *metadata) {
     }
     return ;
   }
-  
+
   struct event *event = createUndiscardableEvent(sim->clock + delay, choose_attraction, NULL, metadata);
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
+
+  if (state->park->improved_run) {
+    if (client->num_active_reservations == 5)
+      return;
+    
+    for(int j = 0 ; j < 5 ; j++) {
+
+      if(client->active_reservations[j].expired) {
+
+        double p ;
+        int selected_ride_idx ;
+extract_ride:
+        p = GetRandomFromDistributionType(RESERVED_STREAM, UNIFORM, 0, 1);
+        if (p <= state->popularities[0])
+          selected_ride_idx = 0;
+        else {
+          for (int i = 1; i < state->park->num_rides + state->park->num_shows; i++) {
+            if (state->popularities[i - 1] <= p && p <= state->popularities[i]) {
+              selected_ride_idx = i;
+              break;
+            }
+          }
+        }
+    
+        if(selected_ride_idx >= state->park->num_rides) goto extract_ride ;
+    
+        for(int i = 0 ; i < client->num_active_reservations; i++) {
+          if (client->active_reservations[i].ride_idx == selected_ride_idx)
+            goto extract_ride;
+        }
+
+        client->active_reservations[j].ride_idx = selected_ride_idx;
+        client->active_reservations[j].clients_left = state->rides[selected_ride_idx].reserved_queue->size+1 ;
+        generic_enqueue_element(state->rides[selected_ride_idx].reserved_queue, client) ;
+        client->num_active_reservations++;
+        state->rides[selected_ride_idx].total_reservations += 1;
+      }
+    }
+  }
 }

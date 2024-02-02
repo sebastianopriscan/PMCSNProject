@@ -7,6 +7,7 @@
 #include <rngs.h>
 #include <rvgs.h>
 #include <math.h>
+#include <string.h>
 
 double GetRandomFromDistributionType(int stream, enum distribution_type type, double mu, double sigma) {
   SelectStream(stream);
@@ -53,6 +54,8 @@ struct client *create_new_client(double clock, double end, struct sim_state* sta
 
   me->lost_patience_times = 0 ;
   me->arrival_time = clock;
+  me->num_active_reservations = 0;
+  memset(me->active_reservations, 0, sizeof(struct reservation) * 5);
 
   return me;
 }

@@ -6,6 +6,7 @@
 
 #define CLIENT_QUEUE 0
 #define SHOW_QUEUE 1
+#define TOTAL_STANDARD_QUEUES 2
 
 #define NEXT_ARRIVAL_STREAM 0
 #define PATIENCE_MU_STREAM 1
@@ -14,6 +15,8 @@
 #define DELAY_STREAM 4
 #define POPULARITY_STREAM 5
 #define PATIENCE_STREAM 6
+#define RESERVED_STREAM 7
+#define TOTAL_STREAMS 8
 
 struct client_event {
   struct client *client;

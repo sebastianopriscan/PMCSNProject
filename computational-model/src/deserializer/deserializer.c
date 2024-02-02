@@ -272,5 +272,6 @@ struct park *deserialize(const char *file) {
     }
 
     park->validation_run = 0;
+    park->improved_run = 0;
     return park;
 }
