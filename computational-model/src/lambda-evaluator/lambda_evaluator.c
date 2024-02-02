@@ -6,8 +6,6 @@
 #include <rvgs.h>
 #include <rvms.h>
 #include <generic_queue.h>
-#include <math.h>
-#include "../deserializer/deserializer.h"
 #include "../models/model.h"
 
 #include "lambda_evaluator.h"
@@ -224,7 +222,7 @@ struct return_value* run_lambda_evaluator(double expected_wait, double threshold
         lambda_lower_bound = lambda ;
         direction = 1.0 ;
       }
-      lambda = lambda + direction*delta < 0 ? lambda + direction * delta / 2 : lambda + direction * delta ;
+      lambda = lambda + direction*delta < 0 ? lambda / 2 : lambda + direction * delta ;
       destroy_state(state);
       destroy_simulation(sim);
       continue;
@@ -242,7 +240,7 @@ struct return_value* run_lambda_evaluator(double expected_wait, double threshold
       break;
     }
 
-    lambda = lambda + direction*delta < 0 ? lambda + direction * delta / 2 : lambda + direction * delta ;
+    lambda = lambda + direction*delta < 0 ? lambda / 2 : lambda + direction * delta ;
     destroy_state(state);
     destroy_simulation(sim);
   } while(1);
