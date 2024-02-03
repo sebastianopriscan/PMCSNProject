@@ -4,21 +4,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define client_log(log) (log & 0b0001) 
+#define client_log(log) (log & 0b0001)
 
 int position_in_queue(void *first, void *second) {
   struct client_event *first_client = (struct client_event *) first ;
   struct client_event *second_client = (struct client_event *) second ;
 
   struct reservation *first_reservation;
-  for(int i = 0; i < 5; i++) {
+  for(int i = 0; i < first_client->client->max_prenotations; i++) {
     if (first_client->client->active_reservations[i].expired || first_client->client->active_reservations[i].ride_idx != first_client->selected_attraction_idx)
       continue;
     first_reservation = &first_client->client->active_reservations[i];
   }
   
   struct reservation *second_reservation;
-  for(int i = 0; i < 5; i++) {
+  for(int i = 0; i < second_client->client->max_prenotations ; i++) {
     if (second_client->client->active_reservations[i].expired || second_client->client->active_reservations[i].ride_idx != second_client->selected_attraction_idx)
       continue;
     second_reservation = &second_client->client->active_reservations[i];
@@ -108,6 +108,21 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 
     patience = patience < 0 ? -patience : patience ;
 
+    if (state->park->improved_run) {
+      for(int i = 0 ; i < me->max_prenotations; i++) {
+        if (me->active_reservations[i].expired) 
+          continue;
+
+        struct reservation* res = &me->active_reservations[i];
+        struct ride_state *ride_state = &state->rides[i];
+        struct ride *ride = &state->park->rides[res->ride_idx];
+
+        double estimation = (ride_state->vip_queue->size + res->clients_left) * ride->mu / (ride->server_num / ride->batch_size);
+
+        patience = estimation < patience ? estimation : patience ;        
+      }
+    }
+
     struct event *lose_patience = createEvent(sim->clock + patience, patience_lost, NULL, client_ev);
     client_ev->event = lose_patience;
     int code = add_event_to_simulation(sim, lose_patience, CLIENT_QUEUE);
@@ -137,6 +152,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   if (!state->park->validation_run) 
     return;
 
+  // Validation run code
   for (int i = 0; i < state->park->rides[selected_ride_idx].server_num; i++)
   {
     if (state->rides[selected_ride_idx].busy_servers[i] == 0) {
@@ -228,14 +244,15 @@ void choose_delay(struct simulation* sim, void *metadata) {
   struct client *client = (struct client *) metadata ;
 
   if (state->park->improved_run) {
-    for(int i = 0; i < 5; i++) {
+    // Go to real reserved queue if there is no time
+    for(int i = 0; i < client->max_prenotations; i++) {
       if (client->active_reservations[i].expired) 
         continue;
       int ride_idx = client->active_reservations[i].ride_idx;
       struct ride_state ride = state->rides[ride_idx];
       struct ride park_ride = state->park->rides[ride_idx];
       double estimation = (ride.vip_queue->size + client->active_reservations[i].clients_left) * park_ride.mu / (park_ride.server_num / park_ride.batch_size);
-      if (estimation < state->park->delay_mu && !client->active_reservations[i].expired) {
+      if (estimation < state->park->delay_mu) {
         struct client_event *client_ev = malloc(sizeof(struct client_event));
         client_ev->client = client;
         client_ev->arrival_time = sim->clock;
@@ -257,10 +274,15 @@ void choose_delay(struct simulation* sim, void *metadata) {
   if(state->park->validation_run)
     condition = GetRandomFromDistributionType(POPULARITY_STREAM, UNIFORM, 0, 1) < state->park->exit_probability;
 
+  // Exit Condition
   if (condition) {
     state->total_clients_exited += 1;
     state->total_permanence += (sim->clock - client->arrival_time);
     generic_remove_element(state->clients, client);
+    // Remove client from ride reservations
+    for (int i = 0; i < state->park->num_rides; i++) {
+      generic_remove_element(state->rides[i].reserved_queue, client);
+    }
     free(client) ;
     state->clients_in_park -= 1;
     if (state->clients_in_queue > 0) {
@@ -274,11 +296,7 @@ void choose_delay(struct simulation* sim, void *metadata) {
   add_event_to_simulation(sim, event, CLIENT_QUEUE);
 
   if (state->park->improved_run) {
-    if (client->num_active_reservations == 5)
-      return;
-    
-    for(int j = 0 ; j < 5 ; j++) {
-
+    for(int j = 0 ; j < client->max_prenotations ; j++) {
       if(client->active_reservations[j].expired) {
 
         double p ;
@@ -296,17 +314,20 @@ extract_ride:
           }
         }
     
+        // Skip show
         if(selected_ride_idx >= state->park->num_rides) goto extract_ride ;
     
-        for(int i = 0 ; i < client->num_active_reservations; i++) {
-          if (client->active_reservations[i].ride_idx == selected_ride_idx)
+        // Skip ride with active reservations
+        for(int i = 0 ; i < client->max_prenotations; i++) {
+          if (client->active_reservations[i].ride_idx == selected_ride_idx 
+          && !client->active_reservations[i].expired)
             goto extract_ride;
         }
 
         client->active_reservations[j].ride_idx = selected_ride_idx;
         client->active_reservations[j].clients_left = state->rides[selected_ride_idx].reserved_queue->size+1 ;
+        client->active_reservations[j].expired = 0;
         generic_enqueue_element(state->rides[selected_ride_idx].reserved_queue, client) ;
-        client->num_active_reservations++;
         state->rides[selected_ride_idx].total_reservations += 1;
       }
     }

@@ -113,6 +113,7 @@ struct park *deserialize(const char *file) {
     json_object *park_next_reschedule_rate_json = json_object_object_get(root, "park_next_reschedule_rate");
     json_object *park_exit_rate_json = json_object_object_get(root, "park_exit_rate");
     json_object *until_end_json = json_object_object_get(root, "until_end");
+    json_object *improved_json = json_object_object_get(root, "improved");
 
     park->simulation_time = json_object_get_double(simulation_time_json);
     park->vip_tickets_percent = json_object_get_double(vip_percent_json);
@@ -124,6 +125,7 @@ struct park *deserialize(const char *file) {
     park->normal_ticket_price = json_object_get_int(normal_ticket_price_json);
     park->number_of_clients = json_object_get_int(number_of_clients_json);
     park->delay_enabled = json_object_get_boolean(delay_enabled_json) ;
+    park->improved_run = json_object_get_boolean(improved_json);
     const char* delay_distribution = json_object_get_string(delay_distribution_json);
     if(strcmp(delay_distribution, "normal") == 0) {
       park->delay_distribution = NORMAL_DISTRIB;
@@ -272,6 +274,5 @@ struct park *deserialize(const char *file) {
     }
 
     park->validation_run = 0;
-    park->improved_run = 0;
     return park;
 }

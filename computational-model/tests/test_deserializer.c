@@ -78,6 +78,10 @@ int main(void) {
     fprintf(stderr, "Park Until End: expected true Got: %d\n", park->until_end);
     return 1;
   }
+  if(park->improved_run != 1) {
+    fprintf(stderr, "Improved run: expected 1 Got: %d\n", park->improved_run);
+    return 1;
+  }
   if(park->num_rides != 1) {
     fprintf(stderr, "Num Rides: expected 1 Got: %d\n", park->num_rides);
     return 1;

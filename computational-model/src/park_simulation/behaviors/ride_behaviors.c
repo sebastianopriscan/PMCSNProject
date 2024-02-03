@@ -2,7 +2,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ride_log(log) (log & 0b0100) 
+#define ride_log(log) (log & 0b0100)
+
+void reduce_clients_ahead(struct generic_queue_list* queue, int ride_idx, int processed_clients) {
+
+  struct generic_queue_node *node = queue->head ;
+  while (node != NULL)
+  {
+    struct client *client = (struct client *) node->data ;
+
+    for (int i = 0; i < client->max_prenotations; i++) {
+      if (client->active_reservations[i].expired || client->active_reservations[i].ride_idx != ride_idx) 
+        continue;
+      
+      client->active_reservations[i].clients_left -= processed_clients;
+    }
+    
+    node = node->next;
+  }
+}
 
 void ride_server_activate_validation(struct simulation *sim, void *metadata)
 {
@@ -86,7 +104,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
   struct sim_state *state = (struct sim_state*) sim->state;
   if (ride_log(state->log))
     printf("launched ride_server_activate at %f\n", sim->clock);
-  int stream = ride_meta->queue_index + 5; // + 2 is already present when calculating queue_index
+  int stream = ride_meta->queue_index + TOTAL_STREAMS - TOTAL_STANDARD_QUEUES;
 
   struct ride ride = state->park->rides[ride_meta->ride_idx];
   double service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.sigma);
@@ -119,42 +137,62 @@ void ride_server_activate(struct simulation *sim, void *metadata)
       actual_served++ ;
     }
   }
-  if (state->park->improved_run && state->rides[ride_meta->ride_idx].reserved_queue->head != NULL) {
+  int reserved_served = 0;
+  if (state->park->improved_run && state->rides[ride_meta->ride_idx].real_reserved_queue->head != NULL) {
     for (int k = 0; k < ride.batch_size - actual_served; k++) {
       //Get an effective client in reserved queue
       struct client_event *value = (struct client_event *) generic_dequeue_element(state->rides[ride_meta->ride_idx].real_reserved_queue);
-      if (value == NULL) { //No more clients in reserved queue
+      if (value == NULL) { //No more clients in physical reserved queue (so virtual reservations are all invalid)
+        struct client *content ;
+        do {
+          content = generic_dequeue_element(state->rides[ride_meta->ride_idx].reserved_queue);
+          if(content == NULL) break;
+          for (int i = 0; i < content->max_prenotations; i++) {
+            if(content->active_reservations[i].expired || content->active_reservations[i].ride_idx != ride_meta->ride_idx)
+              continue;
+            content->active_reservations[i].expired = 1;
+          }
+        } while(content != NULL);
+
         break;
       }
-      
+      int expired_clients = 1 ;
+      // Get reservation from client dequeued from real queue
+      struct reservation *res_in_queue = NULL; // First client in queue
+      for (int j = 0; j < value->client->max_prenotations; j++) {
+        if (value->client->active_reservations[j].ride_idx == ride_meta->ride_idx && !value->client->active_reservations[j].expired) {
+          res_in_queue = &value->client->active_reservations[j];
+          break;
+        }
+      }
       //Expire all non-arrived clients with higher priority
       struct client *content ;
       do {
         content = generic_dequeue_element(state->rides[ride_meta->ride_idx].reserved_queue) ;
-        if (content == NULL) 
+        if (content == NULL || content == value->client) 
           break;
-        for(int i = 0; i < 5; i++) {
+
+        for(int i = 0; i < content->max_prenotations; i++) {
           struct reservation *res = &content->active_reservations[i]; // First reserved client (not necessarily in queue)
-          struct reservation *res_in_queue = NULL; // First client in queue
-          for (int j = 0; j < 5; j++) {
-            if (value->client->active_reservations[j].ride_idx == ride_meta->ride_idx) {
-              res_in_queue = &value->client->active_reservations[j];
-              break;
-            }
-          }
-          if (res->ride_idx == ride_meta->ride_idx && res->clients_left < res_in_queue->clients_left) {
+          if (res->expired || res->ride_idx != ride_meta->ride_idx) 
+            continue;
+          
+          if (res->clients_left < res_in_queue->clients_left) {
             res->expired = 1 ;
             res->ride_idx = -1;
-          }
-          else if(content == value->client) {
-            break;
+            expired_clients++;
           }
         }
       } while(1) ;
 
+      reduce_clients_ahead(state->rides[ride_meta->ride_idx].reserved_queue, ride_meta->ride_idx, expired_clients);
+
       arrival_time = arrival_time > value->arrival_time ? arrival_time : value->arrival_time;
       state->rides[ride_meta->ride_idx].total_clients_reserved += 1;
       state->rides[ride_meta->ride_idx].total_delay_reserved += (sim->clock - value->arrival_time) ;
+
+      res_in_queue->expired = 1;
+      res_in_queue->ride_idx = -1;
 
       struct event* choose_delay_event = createUndiscardableEvent(next, choose_delay, NULL, value->client);
       int code = add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);
@@ -163,11 +201,11 @@ void ride_server_activate(struct simulation *sim, void *metadata)
       }
 
       free(value);
-      actual_served++;
+      reserved_served++;
     }
   }
   if (state->rides[ride_meta->ride_idx].normal_queue->head != NULL) {
-    for (int i = 0; i < ride.batch_size - actual_served; i++) {
+    for (int i = 0; i < ride.batch_size - actual_served - reserved_served; i++) {
       struct client_event *value = (struct client_event *) generic_dequeue_element(state->rides[ride_meta->ride_idx].normal_queue);
       if (value == NULL) {
         break;

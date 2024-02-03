@@ -68,8 +68,9 @@ struct sim_state *create_sim_state(struct park *park, int log) {
         rides[i].normal_queue = create_queue_list();
         rides[i].real_reserved_queue = create_queue_list();
         rides[i].reserved_queue = create_queue_list();
-        if (rides[i].busy_servers == NULL || rides[i].normal_queue == NULL || rides[i].vip_queue == NULL || rides[i].real_reserved_queue || rides[i].reserved_queue
-            || rides[i].servers_service_means == NULL || rides[i].servers_served_clients == NULL) {
+        if (rides[i].busy_servers == NULL || rides[i].normal_queue == NULL || rides[i].vip_queue == NULL || 
+            rides[i].real_reserved_queue == NULL || rides[i].reserved_queue == NULL || 
+            rides[i].servers_service_means == NULL || rides[i].servers_served_clients == NULL) {
             fprintf(stderr, "Error allocating ride internal structure for %d\n", i);
             for(int j = 0; j < i ; j++)  {
                 destroy_generic_queue_list(rides[i].vip_queue);

@@ -45,17 +45,22 @@ struct client *create_new_client(double clock, double end, struct sim_state* sta
   }
   me->client_percentage = patience_stdev_percentage;
   if (p < state->park->vip_tickets_percent && state->total_clients_vip < state->park->max_vip_tickets) {
+      me->max_prenotations = 0;
       me->type = VIP;
       state->total_clients_vip += 1;
   } else {
     me->type = NORMAL;
+    me->max_prenotations = 5;
     state->total_clients_normal++;
   }
 
   me->lost_patience_times = 0 ;
   me->arrival_time = clock;
-  me->num_active_reservations = 0;
-  memset(me->active_reservations, 0, sizeof(struct reservation) * 5);
+  for(int i = 0; i < me->max_prenotations; i++) {
+    me->active_reservations[i].clients_left = 0;
+    me->active_reservations[i].ride_idx = -1;
+    me->active_reservations[i].expired = 1;
+  }
 
   return me;
 }

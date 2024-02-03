@@ -9,6 +9,7 @@ void reach_show(struct simulation* sim, void *metadata) {
   if(show_log(state->log))
     printf("launched reach_show at %f\n", sim->clock) ;
   struct client_event *client_ev = (struct client_event *) metadata;
+  struct client* me = client_ev->client;
 
   int show_index = client_ev->selected_attraction_idx - state->park->num_rides;
   state->shows[show_index].total_clients += 1;
@@ -17,6 +18,19 @@ void reach_show(struct simulation* sim, void *metadata) {
   if (state->park->patience_enabled) {
     double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, next, client_ev->client->client_percentage*next);
     patience = patience < 0 ? -patience : patience ;
+    if (state->park->improved_run) {
+      for(int i = 0 ; i < me->max_prenotations ; i++) {
+        if (me->active_reservations[i].expired) 
+          continue;
+
+        struct reservation* res = &me->active_reservations[i];
+        struct ride *ride = &state->park->rides[res->ride_idx];
+
+        double estimation = (state->rides[res->ride_idx].vip_queue->size + res->clients_left) * ride->mu / (ride->server_num / ride->batch_size);
+
+        patience = estimation < patience ? estimation : patience ;        
+      }
+    }
     next = next < patience ? next : patience;
   }
   

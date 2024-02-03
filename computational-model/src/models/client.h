@@ -25,7 +25,7 @@ struct client {
     int lost_patience_times; // Track how many times the client has lost patience
     double arrival_time; // client has entered in the park (not in the entrance queue)
 
-    int num_active_reservations;
+    int max_prenotations ;
     struct reservation active_reservations[5];
 } ;
 

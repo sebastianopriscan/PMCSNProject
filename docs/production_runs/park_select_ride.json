@@ -21,10 +21,11 @@
   "park_next_reschedule_rate" : 0.1,
   "park_exit_rate": 0.002778,
   "until_end": false,
+  "improved" : true,
   "rides": [
     {
       "name": "Toy Soldier Parachute Drop",
-      "popularity": 0.021,
+      "popularity": 0.03,
       "server_num": 36,
       "batch_size": 36,
       "mean_time": 2.0,
@@ -35,7 +36,7 @@
     },
     {
       "name": "Duffy And Friends Play House",
-      "popularity": 0.102,
+      "popularity": 0.02,
       "server_num": 100,
       "batch_size": 100,
       "mean_time": 10.0,
@@ -46,7 +47,7 @@
     },
     {
       "name": "RC Racer",
-      "popularity": 0.052,
+      "popularity": 0.01,
       "server_num": 20,
       "batch_size": 20,
       "mean_time": 5.0,
@@ -57,7 +58,7 @@
     },
     {
       "name": "Slinky Dog Spin",
-      "popularity": 0.02,
+      "popularity": 0.11,
       "server_num": 144,
       "batch_size": 144,
       "mean_time": 2.0,
@@ -68,7 +69,7 @@
     },
     {
       "name": "Big Grizzly Mountain Runaway Mine Cars",
-      "popularity": 0.031,
+      "popularity": 0.07666,
       "server_num": 144,
       "batch_size": 24,
       "mean_time": 3.0,
@@ -79,7 +80,7 @@
     },
     {
       "name": "Dumbo The Flying Elephant",
-      "popularity": 0.031,
+      "popularity": 0.02,
       "server_num": 32,
       "batch_size": 32,
       "mean_time": 3.0,
@@ -90,7 +91,7 @@
     },
     {
       "name": "Jungle River Cruise",
-      "popularity": 0.069,
+      "popularity": 0.03,
       "server_num": 126,
       "batch_size": 14,
       "mean_time": 7.0,
@@ -112,7 +113,7 @@
     },
     {
       "name": "Mystic Manor",
-      "popularity": 0.071,
+      "popularity": 0.05,
       "server_num": 222,
       "batch_size": 6,
       "mean_time": 7.0,
@@ -123,7 +124,7 @@
     },
     {
       "name": "Mickey's PhillarMagic",
-      "popularity": 0.0,
+      "popularity": 0.05224,
       "server_num": 440,
       "batch_size": 440,
       "mean_time": 12.0,
@@ -134,7 +135,7 @@
     },
     {
       "name": "Hyperspace Mountain",
-      "popularity": 0.03,
+      "popularity": 0.2375,
       "server_num": 576,
       "batch_size": 12,
       "mean_time": 3.0,
@@ -145,7 +146,7 @@
     },
     {
       "name": "Iron Man Experience",
-      "popularity": 0.048,
+      "popularity": 0.02,
       "server_num": 45,
       "batch_size": 45,
       "mean_time": 5.0,
@@ -156,7 +157,7 @@
     },
     {
       "name": "Orbitron",
-      "popularity": 0.02,
+      "popularity": 0.05,
       "server_num": 64,
       "batch_size": 64,
       "mean_time": 2.0,
@@ -167,7 +168,7 @@
     },
     {
       "name": "It's a Small World",
-      "popularity": 0.147,
+      "popularity": 0.03,
       "server_num": 156,
       "batch_size": 156,
       "mean_time": 9.0,
@@ -178,7 +179,7 @@
     },
     {
       "name": "Ant-Man and The Wasp",
-      "popularity": 0.01,
+      "popularity": 0.05,
       "server_num": 112,
       "batch_size": 4,
       "mean_time": 4.0,
@@ -189,7 +190,7 @@
     },
     {
       "name": "Mad Hatter Tea Cups",
-      "popularity": 0.02,
+      "popularity": 0.05352,
       "server_num": 72,
       "batch_size": 72,
       "mean_time": 2.0,
@@ -200,7 +201,7 @@
     },
     {
       "name": "Cinderella Carousel",
-      "popularity": 0.029,
+      "popularity": 0.03,
       "server_num": 52,
       "batch_size": 52,
       "mean_time": 3.0,
@@ -213,7 +214,7 @@
   "shows": [
     {
       "name": "Animation Academy",
-      "popularity": 0.072,
+      "popularity": 0.03,
       "mean_time": 30.0,
       "service_distribution": "normal",
       "mu": 0.1,
@@ -225,7 +226,7 @@
   "disabled_rides": [
     {
       "name": "The Royal Reception Hall",
-      "popularity": 0.053,
+      "popularity": 0.03,
       "server_num": 100,
       "batch_size": 100,
       "mean_time": 5.0,
@@ -236,7 +237,7 @@
     },
     {
       "name": "Iron Man Tech Showcase",
-      "popularity": 0.106,
+      "popularity": 0.02,
       "server_num": 100,
       "batch_size": 100,
       "mean_time": 10.0,
@@ -247,7 +248,7 @@
     },
     {
       "name": "Rafts To Tarzan's Treehouse",
-      "popularity": 0.039,
+      "popularity": 0.02,
       "server_num": 48,
       "batch_size": 12,
       "mean_time": 4.0,

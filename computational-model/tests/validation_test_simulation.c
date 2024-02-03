@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
     printf("Incorrect usage: %s --single-queue or %s --single-server or --single\n", argv[0], argv[0]);
     return 1;
   }
+  park->improved_run = 0;
   if(!strcmp("--single-queue", argv[1])) {
     // park->park_arrival_rate = 5.106;
     park->park_arrival_rate = 6.0;
