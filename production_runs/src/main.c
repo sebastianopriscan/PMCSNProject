@@ -149,7 +149,7 @@ void do_run(struct park *park) {
   double u = 1.0 - 0.5 * (1.0 - CONFIDENCE);
   double t = idfStudent(NUM_RUNS - 1, u);
   printf("Name, Mean Delay, stdev Delay, width Delay, Mean Normal Delay, stdev Normal Delay, width Normal Delay, Mean VIP Delay, stdev VIP Delay, width VIP Delay, ");
-  printf("Mean Lost Normal, stdev Normal Lost, width Normal Lost, VIP Lost Normal, stdev VIP Lost, width VIP Lost\n");
+  printf("Mean Lost Normal, stdev Normal Lost, width Normal Lost, VIP Lost Normal, stdev VIP Lost, width VIP Lost, ");
   printf("Mean Reserved Delay, stdev Reserved Delay, width Reserved Delay, Mean Lost Reserved, stdev Lost Reserved, width Lost Reserved\n");
   for (int j = 0; j < park->num_rides; j++) {
     
