@@ -225,7 +225,6 @@ void delete_sim_state(struct sim_state *state) {
             empty_generic_queue_list(state->rides[i].vip_queue) ;
             empty_generic_queue_list(state->rides[i].normal_queue) ;
             empty_generic_queue_list(state->rides[i].real_reserved_queue) ;
-            empty_generic_queue_list(state->rides[i].reserved_queue) ;
             destroy_generic_queue_list(state->rides[i].vip_queue);
             destroy_generic_queue_list(state->rides[i].normal_queue);
             destroy_generic_queue_list(state->rides[i].real_reserved_queue) ;
