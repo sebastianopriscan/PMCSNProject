@@ -125,7 +125,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
       state->rides[ride_meta->ride_idx].total_delay_vip += (sim->clock - value->arrival_time);
       
       if (state->park->patience_enabled)
-        delete_event_from_simulation(sim, CLIENT_QUEUE, value->event) ; //TODO: Check if client queue is too busy, and evaluate moving to dedicated queue
+        delete_event_from_simulation(sim, TOTAL_STANDARD_QUEUES + ride_meta->ride_idx, value->event) ; 
   
       struct event* choose_delay_event = createUndiscardableEvent(next, choose_delay, NULL, value->client);
       int code = add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);
@@ -216,7 +216,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
       state->rides[ride_meta->ride_idx].total_delay_normal += (sim->clock - value->arrival_time) ;
       
       if (state->park->patience_enabled)
-        delete_event_from_simulation(sim, CLIENT_QUEUE, value->event) ; //TODO: Check if client queue is too busy, and evaluate moving to dedicated queue
+        delete_event_from_simulation(sim, TOTAL_STANDARD_QUEUES + ride_meta->ride_idx, value->event) ; 
 
       struct event* choose_delay_event = createUndiscardableEvent(next, choose_delay, NULL, value->client);
       int code = add_event_to_simulation(sim, choose_delay_event, CLIENT_QUEUE);

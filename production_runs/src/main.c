@@ -101,7 +101,7 @@ void do_run(struct park *park) {
 
       double normal_lost_diff = 0.0;
       if (ride.total_arrived_normal != 0) 
-        normal_lost_diff = (ride.total_lost_normal / ride.total_arrived_normal) - stats_means[j].mean_lost_normal;
+        normal_lost_diff = ((float)ride.total_lost_normal / ride.total_arrived_normal) - stats_means[j].mean_lost_normal;
       else
         fprintf(stderr, "Run %d, ride %d: total_arrived_normal is 0\n", i, j);
       
@@ -110,7 +110,7 @@ void do_run(struct park *park) {
 
       double vip_lost_diff = 0.0;
       if (ride.total_arrived_vip != 0)
-        vip_lost_diff = (ride.total_lost_vip / ride.total_arrived_vip) - stats_means[j].mean_lost_vip;
+        vip_lost_diff = ((float)ride.total_lost_vip / ride.total_arrived_vip) - stats_means[j].mean_lost_vip;
       else
         fprintf(stderr, "Run %d, ride %d: total_arrived_vip is 0\n", i, j);
       
@@ -128,7 +128,7 @@ void do_run(struct park *park) {
 
       double lost_reserved_diff = 0.0;
       if (ride.total_reservations != 0)
-        lost_reserved_diff = (ride.total_reservations - ride.total_clients_reserved) / ride.total_reservations - stats_means[j].mean_lost_reserved;
+        lost_reserved_diff = ((float)ride.total_reservations - ride.total_clients_reserved) / ride.total_reservations - stats_means[j].mean_lost_reserved;
       else
         fprintf(stderr, "Run %d, ride %d: total_reservations is 0\n", i, j);
 
