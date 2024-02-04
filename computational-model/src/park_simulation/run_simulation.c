@@ -19,6 +19,8 @@ struct simulation* run_park_simulation(const char *path, int log) {
 
 struct simulation* run_park_simulation_from_park(struct park *park, int log) {
   int num_queues = 2;
+  if (!park->validation_run) 
+    num_queues += park->num_rides;
   for (int i = 0; i < park->num_rides; i++) {
     if (park->validation_run)
       num_queues += park->rides[i].server_num;
@@ -54,7 +56,7 @@ struct simulation* run_park_simulation_from_park(struct park *park, int log) {
     }
   }
   if (!park->validation_run) {
-    int queue_index = 2;
+    int queue_index = 2 + park->num_rides;
     for (int i = 0; i < park->num_rides; i++) {
       for (int j = 0; j < park->rides[i].server_num / park->rides[i].batch_size; j++) {
         struct ride_metadata *ride_meta = malloc(sizeof(struct ride_metadata));
@@ -125,7 +127,8 @@ struct simulation* run_park_simulation_from_park(struct park *park, int log) {
 
 //Clienti             : 0
 //Show                : 1
-//Giostra i, server k : 2 + sum(j in 0..i-1){ride[j]*serverNum[j]} + k
+//Giostra i, patience : i
+//Giostra i, server k : 2 + i + sum(j in 0..i-1){ride[j]*serverNum[j]} + k
 
 // Streams
 // 0: next arrival
