@@ -36,6 +36,9 @@ struct statistics_sample_means
 
   double mean_lost_reserved;
   double sum_lost_reserved;
+
+  double mean_lost_for_reservation;
+  double sum_lost_for_reservation;
 };
 
 struct statistics_sample_means* stats_means;
@@ -134,6 +137,15 @@ void do_run(struct park *park) {
 
       stats_means[j].sum_lost_reserved += lost_reserved_diff * lost_reserved_diff * ((i + 1) - 1.0) / (i + 1);
       stats_means[j].mean_lost_reserved += lost_reserved_diff / (i + 1);
+
+      double lost_for_reservation_diff = 0.0;
+      if (ride.total_arrived_normal)
+        lost_for_reservation_diff = ((float)ride.total_lost_for_reservation / ride.total_arrived_normal) - stats_means[j].mean_lost_for_reservation;
+      else 
+        fprintf(stderr, "Run %d, ride %d: total_arrived_normal is 0\n", i, j);
+
+      stats_means[j].sum_lost_for_reservation += lost_for_reservation_diff * lost_for_reservation_diff * ((i + 1) - 1.0) / (i + 1);
+      stats_means[j].mean_lost_for_reservation += lost_for_reservation_diff / (i + 1);
     }
     double normal_diff = state->total_clients_normal - mean_normal;
     sum_normal += normal_diff * normal_diff * ((i + 1) - 1.0) / (i + 1);
@@ -150,7 +162,8 @@ void do_run(struct park *park) {
   double t = idfStudent(NUM_RUNS - 1, u);
   printf("Name, Mean Delay, stdev Delay, width Delay, Mean Normal Delay, stdev Normal Delay, width Normal Delay, Mean VIP Delay, stdev VIP Delay, width VIP Delay, ");
   printf("Mean Lost Normal, stdev Normal Lost, width Normal Lost, VIP Lost Normal, stdev VIP Lost, width VIP Lost, ");
-  printf("Mean Reserved Delay, stdev Reserved Delay, width Reserved Delay, Mean Lost Reserved, stdev Lost Reserved, width Lost Reserved\n");
+  printf("Mean Reserved Delay, stdev Reserved Delay, width Reserved Delay, Mean Lost Reserved, stdev Lost Reserved, width Lost Reserved, ");
+  printf("Mean Lost For Reservation, stdev Lost For Reservation, width Lost For Reservation\n");
   for (int j = 0; j < park->num_rides; j++) {
     
     double stdev_delay = sqrt(stats_means[j].sum_mean_delay / NUM_RUNS);
@@ -173,9 +186,12 @@ void do_run(struct park *park) {
 
     double stdev_lost_reserved = sqrt(stats_means[j].sum_lost_reserved / NUM_RUNS);
     double w_lost_reserved = t * stdev_lost_reserved / sqrt(NUM_RUNS - 1);
+
+    double stdev_lost_for_reservation = sqrt(stats_means[j].sum_lost_for_reservation / NUM_RUNS);
+    double w_lost_for_reservation = t * stdev_lost_for_reservation / sqrt(NUM_RUNS - 1);
     
     struct statistics_sample_means means = stats_means[j];
-    printf("%s, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f\n",
+    printf("%s, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f, %6.6f\n",
             park->rides[j].name, 
             means.mean_mean_delay, stdev_delay, w_delay, 
             means.mean_mean_delay_normal, stdev_delay_normal, w_delay_normal, 
@@ -183,7 +199,8 @@ void do_run(struct park *park) {
             means.mean_lost_normal, stdev_lost_normal, w_lost_normal, 
             means.mean_lost_vip, stdev_lost_vip, w_lost_vip,
             means.mean_mean_reservation_delay, stdev_delay_reserved, w_delay_reserved, 
-            means.mean_lost_reserved, stdev_lost_reserved, w_lost_reserved);
+            means.mean_lost_reserved, stdev_lost_reserved, w_lost_reserved,
+            means.mean_lost_for_reservation, stdev_lost_for_reservation, w_lost_for_reservation);
   }
   
   double stdev_normal = sqrt(sum_normal / NUM_RUNS);

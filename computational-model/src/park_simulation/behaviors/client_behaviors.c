@@ -49,9 +49,15 @@ void patience_lost(struct simulation *sim, void *metadata) {
     state->rides[client_event->selected_attraction_idx].total_delay_vip += (sim->clock - client_event->arrival_time);
   } else {
     generic_remove_element(state->rides[client_event->selected_attraction_idx].normal_queue, client_event);
-    state->rides[client_event->selected_attraction_idx].total_lost_normal += 1;
-    state->rides[client_event->selected_attraction_idx].total_lost_normal_delay += (sim->clock - client_event->arrival_time);
-    state->rides[client_event->selected_attraction_idx].total_delay_normal += (sim->clock - client_event->arrival_time);
+    if (client_event->isPatience) {
+      state->rides[client_event->selected_attraction_idx].total_lost_normal += 1;
+      state->rides[client_event->selected_attraction_idx].total_lost_normal_delay += (sim->clock - client_event->arrival_time);
+      state->rides[client_event->selected_attraction_idx].total_delay_normal += (sim->clock - client_event->arrival_time);
+    } else {
+      state->rides[client_event->selected_attraction_idx].total_lost_for_reservation += 1;
+      state->rides[client_event->selected_attraction_idx].total_lost_for_reservation_normal_delay += (sim->clock - client_event->arrival_time);
+      state->rides[client_event->selected_attraction_idx].total_delay_normal += (sim->clock - client_event->arrival_time);
+    }
   }
   free(client_event);
   struct event *event = createUndiscardableEvent(sim->clock, choose_delay, NULL, client);
@@ -94,6 +100,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   client_ev->selected_attraction_idx = selected_ride_idx;
   client_ev->arrival_time = sim->clock ;
   client_ev->event = NULL;
+  client_ev->isPatience = 1;
   
   if (selected_ride_idx >= state->park->num_rides) {
     struct event *reach_show_event = createEvent(sim->clock, reach_show, NULL, client_ev);
@@ -119,7 +126,10 @@ void choose_attraction(struct simulation *sim, void *metadata) {
         
         double estimation = (ride_state->vip_queue->size + res->clients_left) * ride->mu / ride->server_num;
 
-        patience = estimation < patience ? estimation : patience ;
+        if(estimation < patience) {
+          patience = estimation ;
+          client_ev->isPatience = 0 ;
+        }
       }
     }
 

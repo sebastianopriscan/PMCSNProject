@@ -31,6 +31,9 @@ struct ride_state {
   double total_delay_reserved;
   double total_delay_vip;
 
+  int total_lost_for_reservation;
+  double total_lost_for_reservation_normal_delay;
+
   int total_lost_normal ;
   int total_lost_vip ;
   double total_lost_normal_delay ;
