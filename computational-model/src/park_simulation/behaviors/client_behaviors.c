@@ -104,7 +104,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
   // NOTE: check for patience sigma
   if (state->park->patience_enabled) {
     double mean_time = state->park->rides[selected_ride_idx].mu;
-    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, mean_time + 10.0, mean_time * me->client_percentage);
+    double patience = GetRandomFromDistributionType(PATIENCE_STREAM, NORMAL_DISTRIB, mean_time + 60.0, mean_time * me->client_percentage);
 
     patience = patience < 0 ? -patience : patience ;
 
@@ -116,7 +116,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
         struct reservation* res = &me->active_reservations[i];
         struct ride_state *ride_state = &state->rides[i];
         struct ride *ride = &state->park->rides[res->ride_idx];
-
+        
         double estimation = (ride_state->vip_queue->size + res->clients_left) * ride->mu / ride->server_num;
 
         patience = estimation < patience ? estimation : patience ;
@@ -125,7 +125,7 @@ void choose_attraction(struct simulation *sim, void *metadata) {
 
     struct event *lose_patience = createEvent(sim->clock + patience, patience_lost, NULL, client_ev);
     client_ev->event = lose_patience;
-    int code = add_event_to_simulation(sim, lose_patience, CLIENT_QUEUE);
+    int code = add_event_to_simulation(sim, lose_patience, TOTAL_STANDARD_QUEUES + selected_ride_idx);
     if(code == 1) {
       free(lose_patience) ;
       client_ev->event = NULL;
