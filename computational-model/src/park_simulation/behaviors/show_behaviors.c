@@ -26,14 +26,14 @@ void reach_show(struct simulation* sim, void *metadata) {
         struct reservation* res = &me->active_reservations[i];
         struct ride *ride = &state->park->rides[res->ride_idx];
 
-        double estimation = (state->rides[res->ride_idx].vip_queue->size + res->clients_left) * ride->mu / (ride->server_num / ride->batch_size);
+        double estimation = (state->rides[res->ride_idx].vip_queue->size + res->clients_left) * ride->mu / ride->server_num;
 
         patience = estimation < patience ? estimation : patience ;        
       }
     }
     next = next < patience ? next : patience;
   }
-  
+ 
   state->shows[show_index].total_permanence += next;
 
   struct event *event = createUndiscardableEvent(sim->clock + next, choose_delay, NULL, client_ev->client);

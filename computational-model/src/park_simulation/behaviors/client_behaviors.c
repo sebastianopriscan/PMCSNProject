@@ -116,10 +116,10 @@ void choose_attraction(struct simulation *sim, void *metadata) {
         struct reservation* res = &me->active_reservations[i];
         struct ride_state *ride_state = &state->rides[i];
         struct ride *ride = &state->park->rides[res->ride_idx];
+        
+        double estimation = (ride_state->vip_queue->size + res->clients_left) * ride->mu / ride->server_num;
 
-        double estimation = (ride_state->vip_queue->size + res->clients_left) * ride->mu / ((float)ride->server_num / ride->batch_size);
-
-        patience = estimation < patience ? estimation : patience ;        
+        patience = estimation < patience ? estimation : patience ;
       }
     }
 
@@ -251,7 +251,7 @@ void choose_delay(struct simulation* sim, void *metadata) {
       int ride_idx = client->active_reservations[i].ride_idx;
       struct ride_state ride = state->rides[ride_idx];
       struct ride park_ride = state->park->rides[ride_idx];
-      double estimation = (ride.vip_queue->size + client->active_reservations[i].clients_left) * park_ride.mu / (park_ride.server_num / park_ride.batch_size);
+      double estimation = (ride.vip_queue->size + client->active_reservations[i].clients_left) * park_ride.mu / park_ride.server_num;
       if (estimation < state->park->delay_mu) {
         struct client_event *client_ev = malloc(sizeof(struct client_event));
         client_ev->client = client;
