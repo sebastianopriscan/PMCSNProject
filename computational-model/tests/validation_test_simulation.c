@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < park->num_rides; i++) {
       park->rides[i].popularity = 1.0 / (park->num_rides + park->num_shows) ;
     }
-    park->rides[3].server_num = 50;
+    park->rides[3].server_num = 100;
   } else if (!strcmp("--single-server", argv[1])) {
     park->park_arrival_rate = 0.0004;
     park->simulation_time = 1000000.0;
