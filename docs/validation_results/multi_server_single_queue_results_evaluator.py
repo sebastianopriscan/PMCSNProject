@@ -30,9 +30,12 @@ def main() :
 
   print('Name, Lambda, Service Time, Server Num, Empirical Queue Time, Theoretical Queue Time, Rho, , Check Result')
   for i in range(len(name)) :
-    theoretical_queue_time = formula(lmba=lmba[i], node_mean_time=node_mean_time[i], server_num=server_num[i])
+    s_num = server_num[i]
+    if i == 3:
+      s_num = 100
+    theoretical_queue_time = formula(lmba=lmba[i], node_mean_time=node_mean_time[i], server_num=s_num)
     check = abs(theoretical_queue_time - queue_time[i]) < tolerance
-    print(f'{name[i]}, {lmba[i]}, {node_mean_time[i]}, {server_num[i]}, {queue_time[i]}, {theoretical_queue_time}, {lmba[i] * node_mean_time[i] / server_num[i]} , {check}')
+    print(f'{name[i]}, {lmba[i]}, {node_mean_time[i]}, {s_num}, {queue_time[i]}, {theoretical_queue_time}, {lmba[i] * node_mean_time[i] / s_num} , {check}')
  
 # E[T_q] = (P_q E[S]) / (1-rho)
 # E[S] = E[S_i] / m

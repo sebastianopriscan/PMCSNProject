@@ -23,7 +23,7 @@
     "rides": [
       {
         "name": "The Royal Reception Hall",
-        "popularity": 0.053,
+        "popularity": 0.03,
         "server_num": 100,
         "mean_time": 5.0,
         "service_distribution": "exponential",
@@ -33,7 +33,7 @@
       },
       {
         "name": "Toy Soldier Parachute Drop",
-        "popularity": 0.021,
+        "popularity": 0.03,
         "server_num": 36,
         "mean_time": 2.0,
         "service_distribution": "exponential",
@@ -43,7 +43,7 @@
       },
       {
         "name": "Duffy And Friends Play House",
-        "popularity": 0.102,
+        "popularity": 0.02,
         "server_num": 100,
         "mean_time": 10.0,
         "service_distribution": "exponential",
@@ -53,7 +53,7 @@
       },
       {
         "name": "RC Racer",
-        "popularity": 0.052,
+        "popularity": 0.01,
         "server_num": 20,
         "mean_time": 5.0,
         "service_distribution": "exponential",
@@ -63,7 +63,7 @@
       },
       {
         "name": "Iron Man Tech Showcase",
-        "popularity": 0.106,
+        "popularity": 0.02,
         "server_num": 100,
         "mean_time": 10.0,
         "service_distribution": "exponential",
@@ -73,7 +73,7 @@
       },
       {
         "name": "Slinky Dog Spin",
-        "popularity": 0.02,
+        "popularity": 0.11,
         "server_num": 144,
         "mean_time": 2.0,
         "service_distribution": "exponential",
@@ -83,7 +83,7 @@
       },
       {
         "name": "Big Grizzly Mountain Runaway Mine Cars",
-        "popularity": 0.031,
+        "popularity": 0.07666,
         "server_num": 144,
         "mean_time": 3.0,
         "service_distribution": "exponential",
@@ -93,7 +93,7 @@
       },
       {
         "name": "Dumbo The Flying Elephant",
-        "popularity": 0.031,
+        "popularity": 0.02,
         "server_num": 32,
         "mean_time": 3.0,
         "service_distribution": "exponential",
@@ -103,7 +103,7 @@
       },
       {
         "name": "Jungle River Cruise",
-        "popularity": 0.069,
+        "popularity": 0.03,
         "server_num": 126,
         "mean_time": 7.0,
         "service_distribution": "exponential",
@@ -123,7 +123,7 @@
       },
       {
         "name": "Mystic Manor",
-        "popularity": 0.071,
+        "popularity": 0.05,
         "server_num": 222,
         "mean_time": 7.0,
         "service_distribution": "exponential",
@@ -133,7 +133,7 @@
       },
       {
         "name": "Mickey's PhillarMagic",
-        "popularity": 0.0,
+        "popularity": 0.05224,
         "server_num": 440,
         "mean_time": 12.0,
         "service_distribution": "exponential",
@@ -143,7 +143,7 @@
       },
       {
         "name": "Hyperspace Mountain",
-        "popularity": 0.03,
+        "popularity": 0.2375,
         "server_num": 576,
         "mean_time": 3.0,
         "service_distribution": "exponential",
@@ -153,7 +153,7 @@
       },
       {
         "name": "Iron Man Experience",
-        "popularity": 0.048,
+        "popularity": 0.02,
         "server_num": 45,
         "mean_time": 5.0,
         "service_distribution": "exponential",
@@ -163,7 +163,7 @@
       },
       {
         "name": "Orbitron",
-        "popularity": 0.02,
+        "popularity": 0.05,
         "server_num": 64,
         "mean_time": 2.0,
         "service_distribution": "exponential",
@@ -173,7 +173,7 @@
       },
       {
         "name": "Rafts To Tarzan's Treehouse",
-        "popularity": 0.039,
+        "popularity": 0.02,
         "server_num": 48,
         "mean_time": 4.0,
         "service_distribution": "exponential",
@@ -183,7 +183,7 @@
       },
       {
         "name": "It's a Small World",
-        "popularity": 0.147,
+        "popularity": 0.03,
         "server_num": 156,
         "mean_time": 9.0,
         "service_distribution": "exponential",
@@ -193,7 +193,7 @@
       },
       {
         "name": "Ant-Man and The Wasp",
-        "popularity": 0.01,
+        "popularity": 0.05,
         "server_num": 112,
         "mean_time": 4.0,
         "service_distribution": "exponential",
@@ -203,7 +203,7 @@
       },
       {
         "name": "Mad Hatter Tea Cups",
-        "popularity": 0.02,
+        "popularity": 0.05352,
         "server_num": 72,
         "mean_time": 2.0,
         "service_distribution": "exponential",
@@ -213,7 +213,7 @@
       },
       {
         "name": "Cinderella Carousel",
-        "popularity": 0.029,
+        "popularity": 0.03,
         "server_num": 52,
         "mean_time": 3.0,
         "service_distribution": "exponential",
@@ -224,26 +224,6 @@
     ],
     "shows": [],
     "disabled_rides": [
-      {
-        "name": "Main Street Vehicles",
-        "popularity": "from lambda",
-        "server_num": 2,
-        "mean_time": 3.0,
-        "service_distribution": "normal",
-        "mu": 3.0,
-        "sigma": 0.1,
-        "expected_wait": "no value"
-      },
-      {
-        "name": "Hong Kong Disneyland Railroad - Main Street Station",
-        "popularity": "from lambda",
-        "server_num": 2,
-        "mean_time": 20.0,
-        "service_distribution": "normal",
-        "mu": 20.0,
-        "sigma": 0.1,
-        "expected_wait": "no_value"
-      },
       {
         "name": "Animation Academy",
         "popularity": 0.072,

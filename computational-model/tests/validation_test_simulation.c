@@ -42,7 +42,6 @@ int main(int argc, char **argv) {
     park->until_end = 0;
     for (int i = 0; i < park->num_rides; i++) {
       park->rides[i].server_num = 1;
-      park->rides[i].popularity = 1.0 / (park->num_rides + park->num_shows) ;
     }
   }
   struct simulation *sim = run_park_simulation_from_park(park, 0) ;

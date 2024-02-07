@@ -29,16 +29,11 @@ def createMatrix(probabilities, q):
   return np.array(rows)
  
 def main():
-  if len(sys.argv) != 4:
-    print(f"Incorrect usage: expected {sys.argv[0]} <number> <arrival_rate> <q>")
+  if len(sys.argv) != 3:
+    print(f"Incorrect usage: expected {sys.argv[0]} <source.json> <arrival_rate>")
     return
-  n = int(sys.argv[1])
   lmba = float(sys.argv[2])
-  q = float(sys.argv[3])
-  # probabilities, exit_rate = extractProbabilities(source)
-  probabilities = []
-  for _ in range(0, n):
-    probabilities.append(1/n)
+  probabilities, q = extractProbabilities(sys.argv[1])
   
   matrix = createMatrix(probabilities, q)
   b = -np.array(probabilities)*lmba
