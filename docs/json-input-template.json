@@ -1,12 +1,6 @@
 {
     "simulation_time" : 960.0,
     "vip_percent": 0.5,
-    "max_vip_tickets": 1,
-    "maintenance_cost_per_rides": 1,
-    "maintenance_cost_per_shows": 1,
-    "construction_cost_per_seat": 1,
-    "vip_ticket_price": 1,
-    "normal_ticket_price": 1,
     "number_of_clients": 1,
     "delay_enabled": true,
     "delay_distribution": "normal",
@@ -16,9 +10,7 @@
     "patience_distribution": "normal",
     "patience_mu": 0.1,
     "patience_sigma": 0.1,
-    "max_group_size": 5,
     "park_arrival_rate" : 0.1,
-    "park_next_reschedule_rate" : 0.1,
     "park_exit_rate": 0.01,
     "until_end": true,
     "improved": true,
@@ -28,7 +20,6 @@
         "popularity": 0.1,
         "server_num": 1,
         "batch_size": 1,
-        "mean_time": 0.1,
         "service_distribution": "normal",
         "mu": 0.1,
         "sigma": 0.1,
@@ -39,10 +30,7 @@
       {
         "name": "Name",
         "popularity": 0.1,
-        "mean_time": 0.1,
         "service_distribution": "normal",
-        "mu": 0.1,
-        "sigma": 0.1,
         "length": 30,
         "starting_times": [
           120, 180, 300, 360

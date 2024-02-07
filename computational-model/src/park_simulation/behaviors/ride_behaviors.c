@@ -37,7 +37,7 @@ void ride_server_activate_validation(struct simulation *sim, void *metadata)
   if (state->rides[ride_meta->ride_idx].normal_queue->head != NULL || state->rides[ride_meta->ride_idx].vip_queue->head != NULL) {
     
     struct ride ride = state->park->rides[ride_meta->ride_idx];
-    service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.sigma);
+    service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.mu * ride.sigma);
     service_time = service_time < 0 ? ride.mu : service_time ;
   }
 
@@ -107,7 +107,7 @@ void ride_server_activate(struct simulation *sim, void *metadata)
   int stream = ride_meta->queue_index + TOTAL_STREAMS - TOTAL_STANDARD_QUEUES;
 
   struct ride ride = state->park->rides[ride_meta->ride_idx];
-  double service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.sigma);
+  double service_time = GetRandomFromDistributionType(stream, ride.distribution, ride.mu, ride.mu * ride.sigma);
   service_time = service_time < 0 ? ride.mu : service_time ;
   double next = sim->clock + service_time;
 

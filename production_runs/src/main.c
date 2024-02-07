@@ -266,7 +266,6 @@ int main(int argc, char **argv) {
     new_rides[newPark->num_rides + i].name = subject_ride->name;
     new_rides[newPark->num_rides + i].popularity = subject_ride->popularity;
     new_rides[newPark->num_rides + i].server_num = subject_ride->server_num;
-    new_rides[newPark->num_rides + i].mean_time = subject_ride->mean_time;
     new_rides[newPark->num_rides + i].distribution = subject_ride->distribution;
     new_rides[newPark->num_rides + i].mu = subject_ride->mu;
     new_rides[newPark->num_rides + i].sigma = subject_ride->sigma;

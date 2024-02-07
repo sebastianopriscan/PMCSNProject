@@ -44,9 +44,6 @@ struct ride *get_rides(json_object* array) {
 
         json_object *json_ride_popularity = json_object_object_get(curr_ride, "popularity");
         park_rides[i].popularity = json_object_get_double(json_ride_popularity);
-
-        json_object *json_ride_mean_time = json_object_object_get(curr_ride, "mean_time");
-        park_rides[i].mean_time= json_object_get_double(json_ride_mean_time);
         
         json_object *json_ride_mu = json_object_object_get(curr_ride, "mu");
         park_rides[i].mu = json_object_get_double(json_ride_mu);
@@ -94,11 +91,6 @@ struct park *deserialize(const char *file) {
     json_object *simulation_time_json = json_object_object_get(root, "simulation_time");
     json_object *vip_percent_json = json_object_object_get(root, "vip_percent");
     json_object *max_vip_tickets_json = json_object_object_get(root, "max_vip_tickets") ;
-    json_object *maintenance_cost_per_rides_json = json_object_object_get(root, "maintenance_cost_per_rides");
-    json_object *maintenance_cost_per_shows_json = json_object_object_get(root, "maintenance_cost_per_shows");
-    json_object *construction_cost_per_seat_json = json_object_object_get(root, "construction_cost_per_seat");
-    json_object *vip_ticket_price_json = json_object_object_get(root, "vip_ticket_price");
-    json_object *normal_ticket_price_json = json_object_object_get(root, "normal_ticket_price");
     json_object *number_of_clients_json = json_object_object_get(root, "number_of_clients");
     json_object *delay_enabled_json = json_object_object_get(root, "delay_enabled");
     json_object *delay_distribution_json = json_object_object_get(root, "delay_distribution");
@@ -108,9 +100,7 @@ struct park *deserialize(const char *file) {
     json_object *patience_distribution_json = json_object_object_get(root, "patience_distribution");
     json_object *patience_mu_json = json_object_object_get(root, "patience_mu");
     json_object *patience_sigma_json = json_object_object_get(root, "patience_sigma");
-    json_object *max_group_size_json = json_object_object_get(root, "max_group_size");
     json_object *park_arrival_rate_json = json_object_object_get(root, "park_arrival_rate");
-    json_object *park_next_reschedule_rate_json = json_object_object_get(root, "park_next_reschedule_rate");
     json_object *park_exit_rate_json = json_object_object_get(root, "park_exit_rate");
     json_object *until_end_json = json_object_object_get(root, "until_end");
     json_object *improved_json = json_object_object_get(root, "improved");
@@ -118,11 +108,6 @@ struct park *deserialize(const char *file) {
     park->simulation_time = json_object_get_double(simulation_time_json);
     park->vip_tickets_percent = json_object_get_double(vip_percent_json);
     park->max_vip_tickets = json_object_get_int(max_vip_tickets_json) ;
-    park->maintainance_cost_per_rides = json_object_get_int(maintenance_cost_per_rides_json);
-    park->maintainance_cost_per_shows = json_object_get_int(maintenance_cost_per_shows_json);
-    park->construction_cost_per_seat = json_object_get_int(construction_cost_per_seat_json);
-    park->vip_ticket_price = json_object_get_int(vip_ticket_price_json);
-    park->normal_ticket_price = json_object_get_int(normal_ticket_price_json);
     park->number_of_clients = json_object_get_int(number_of_clients_json);
     park->delay_enabled = json_object_get_boolean(delay_enabled_json) ;
     park->improved_run = json_object_get_boolean(improved_json);
@@ -155,9 +140,7 @@ struct park *deserialize(const char *file) {
     }
     park->patience_mu = json_object_get_double(patience_mu_json);
     park->patience_sigma = json_object_get_double(patience_sigma_json);
-    park->max_group_size = json_object_get_int(max_group_size_json);
     park->park_arrival_rate = json_object_get_double(park_arrival_rate_json);
-    park->park_next_reschedule_rate = json_object_get_double(park_next_reschedule_rate_json);
     park->park_exit_rate = json_object_get_double(park_exit_rate_json);
     park->until_end = json_object_get_boolean(until_end_json);
 
@@ -210,15 +193,6 @@ struct park *deserialize(const char *file) {
         json_object *json_show_popularity = json_object_object_get(curr_show, "popularity");
         park_shows[i].popularity = json_object_get_double(json_show_popularity);
 
-        json_object *json_show_mean_time = json_object_object_get(curr_show, "mean_time");
-        park_shows[i].mean_time= json_object_get_double(json_show_mean_time);
-        
-        json_object *json_show_mu = json_object_object_get(curr_show, "mu");
-        park_shows[i].mu = json_object_get_double(json_show_mu);
-        
-        json_object *json_show_sigma = json_object_object_get(curr_show, "sigma");
-        park_shows[i].sigma = json_object_get_double(json_show_sigma);
-        
         json_object *service_distribution_json = json_object_object_get(curr_show, "service_distribution");
         const char* service_distribution = json_object_get_string(service_distribution_json);
         if(strcmp(service_distribution, "normal") == 0) {
