@@ -245,6 +245,7 @@
       "popularity": 0.02,
       "server_num": 48,
       "batch_size": 12,
+      "service_distribution": "normal",
       "mu": 4.0,
       "sigma": 0.04,
       "expected_wait": 12.0
