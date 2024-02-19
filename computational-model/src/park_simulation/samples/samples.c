@@ -20,5 +20,5 @@ void collect_stats(struct simulation *sim, void *metadata) {
       sum_vip += ride.total_arrived_vip;
       total_patience_losses += ride.total_lost_normal;
     }
-    printf("%6.6f, %6.6f, %6.6f\n", sum_delay_normal / sum_normal, sum_delay_vip / sum_vip, ((float)total_patience_losses) / sum_normal);
+    printf("%6.6f, %6.6f, %6.6f, %6.6f\n", sim->clock, sum_delay_normal / sum_normal, sum_delay_vip / sum_vip, ((float)total_patience_losses) / sum_normal);
 }
