@@ -9,6 +9,7 @@ add_library(computational-model
   src/park_simulation/behaviors/client_behaviors.c
   src/park_simulation/behaviors/ride_behaviors.c
   src/park_simulation/behaviors/show_behaviors.c
+  src/park_simulation/samples/samples.c
   src/park_simulation/run_simulation.c
   src/models/utils.c
 )
