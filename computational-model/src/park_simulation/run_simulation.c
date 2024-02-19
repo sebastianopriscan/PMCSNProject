@@ -80,7 +80,7 @@ struct simulation* run_park_simulation_from_park(struct park *park, int log) {
     struct event *collect_stats_event = createEvent(i, collect_stats, NULL, NULL);
     add_event_to_simulation(sim, collect_stats_event, 1);
   }
-  printf("Clock, Mean Delay Normal, Mean Delay VIP, Percent Patience Lost\n");
+  printf("Clock, Mean Delay Normal, Mean Delay VIP, Percent Patience Lost, Percent Lost Reservation\n");
 
   run_simulation(sim);
   fflush(stdout);
