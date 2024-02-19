@@ -3,6 +3,7 @@
 #include "../models/model.h"
 #include "../deserializer/deserializer.h"
 #include "run_simulation.h"
+#include "samples/samples.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,7 +75,13 @@ struct simulation* run_park_simulation_from_park(struct park *park, int log) {
       }
     }
   }
-  
+
+  for(double i = 10.0; i <= sim->simEnd; i+= 10.0) {
+    struct event *collect_stats_event = createEvent(i, collect_stats, NULL, NULL);
+    add_event_to_simulation(sim, collect_stats_event, 1);
+  }
+  printf("Clock, Mean Delay Normal, Mean Delay VIP, Percent Patience Lost\n");
+
   run_simulation(sim);
   fflush(stdout);
   if (stats_log(sim_state->log)) {
